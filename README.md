@@ -1,20 +1,20 @@
 <h1>Magazine Project</h1>
 
-<h3>General Project Summary</h3>
+<h2>General Project Summary</h2>
 
-Lucas ipsum dolor sit amet needa mustafar nadd jagged fortuna kalee bothan muun thisspiasian chazrach. Kamino gungan luke kit walon. Wroonian quermian boltrunians y'bith. Jettster mandell ki-adi-mundi fett rieekan wicket gen'dai bib zuggs. Tapani momaw biggs dantooine c-3po thakwaash. Fosh darth triclops frozarns melodie. Trioculus evazan zabrak taun defel kalarba. Droopy malastare t'landa moff fel. Selkath colton quermian rishii wat. Mantell raynar danni calamari trioculus bespin axmis. Qel-droma y'bith rahn hobbie momaw golda.
+<p>When user visits site, a modal prompt asks for user's name. </p>
 
-Technologies Used
+<h3>Technologies Used</h3>
 
-Deployed Link TBD
+<h4>Deployed Link</h4>h4>
 
 http://my.herokuapp.com/
 
-API's Used
+<h4>API's Used</h4>
 
-API one - http://developer.macys.com/docs
-API two - https://www.flickr.com/services/api/
+API one - <a href="http://developer.macys.com/docs" target="_blank">http://developer.macys.com/docs</a>
+API two - <a href="https://www.flickr.com/services/api/">https://www.flickr.com/services/api/</a>
 
-Trello Link
+<h4>Trello Link</h4>
 
-http://trello.com/myproject
+<a href="https://trello.com/b/SRhmJ7w6/rcb-catalog-project" target="_blank">https://trello.com/b/SRhmJ7w6/rcb-catalog-project</a>
