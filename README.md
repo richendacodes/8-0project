@@ -8,14 +8,24 @@
 
 <h3>Technologies Used</h3>
 
+<ul>
+  <li>HTML</li>
+  <li>CSS</li>
+  <li>Javascript & Jquery</li>
+  <li>APIs</li>
+  <li>AJAX</li>
+  <li>JSON</li>
+  <li>Bootstrap</li>
+</ul>
+
 <h4>Deployed Link</h4>
 
 http://my.herokuapp.com/
 
 <h4>API's Used</h4>
 
-API one - <a href="http://developer.macys.com/docs" target="_blank">http://developer.macys.com/docs</a>
-<br>API two - <a href="https://www.flickr.com/services/api/">https://www.flickr.com/services/api/</a>
+Macy's API - <a href="http://developer.macys.com/docs" target="_blank">http://developer.macys.com/docs</a>
+<br>Flickr API - <a href="https://www.flickr.com/services/api/">https://www.flickr.com/services/api/</a>
 
 <h4>Trello Link</h4>
 
