@@ -2,11 +2,11 @@
 
 <h2>General Project Summary</h2>
 
-<p>When user visits site, a modal prompt asks for user's name. </p>
+<p>When user visits site, a modal prompt asks for user's name and what occasion they're shopping for. The page displays a list of brands, and user selects one from a menu. Items from the Macy's product catalog, and images from Flickr, are displayed as search results.</p>
 
 <h3>Technologies Used</h3>
 
-<h4>Deployed Link</h4>h4>
+<h4>Deployed Link</h4>
 
 http://my.herokuapp.com/
 
