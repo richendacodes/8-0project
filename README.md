@@ -6,7 +6,7 @@
   <li>Page displays list of this week’s best-sellers from NYTimes.</li>
   <li>Click on a book, and row appears with NYTimes review, Shop.com API pulls image, price, rating and review. User can click through to purchase book.</li>
   <li>Click on a different book, row clears to show new information.</li>
-<ul>
+</ul>
 
 
 <h3>Technologies Used</h3>
