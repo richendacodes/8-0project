@@ -1,7 +1,8 @@
 $( document ).ready(function() {
 
 
-  bootbox.alert("Hello world!", function() {
-  
+  bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {                
+	  console.log("Hi "+result);                          
 	});
+
 });
