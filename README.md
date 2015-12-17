@@ -3,7 +3,8 @@
 <h2>General Project Summary</h2>
 
 <ul>
-  <li>Page displays list of this week’s best-sellers from NYTimes.</li>
+  <li>Page displays a carousel showing the top book from 5 bestseller lists.</li>
+  <li>Click on a book in the carousel, and the top ten books display below.</li>
   <li>Click on a book, and row appears with NYTimes review, Shop.com API pulls image, price, rating and review. User can click through to purchase book.</li>
   <li>Click on a different book, row clears to show new information.</li>
 </ul>
