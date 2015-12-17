@@ -27,8 +27,8 @@ http://my.herokuapp.com/
 
 <h4>API's Used</h4>
 
-Macy's API - <a href="http://developer.macys.com/docs" target="_blank">http://developer.macys.com/docs</a>
-<br>Flickr API - <a href="https://www.flickr.com/services/api/">https://www.flickr.com/services/api/</a>
+NY Times Bestseller API <a href="http://developer.nytimes.com/docs/read/best_sellers_api">http://developer.nytimes.com/docs/read/best_sellers_api</a>
+<br>Shop.com API <a href="https://developer.shop.com/documentation/ProductService">https://developer.shop.com/documentation/ProductService</a>
 
 <h4>Trello Link</h4>
 
