@@ -5,4 +5,8 @@ $( document ).ready(function() {
 	  console.log("Hi "+result);                          
 	});
 
+  $("#rondellCarousel").rondell({
+      preset: "carousel",
+    });
+
 });
