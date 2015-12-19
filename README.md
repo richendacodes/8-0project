@@ -1,4 +1,4 @@
-<h1>Magazine Project</h1>
+<h1>LiveCatalog</h1>
 
 <h2>General Project Summary</h2>
 
