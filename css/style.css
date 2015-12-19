@@ -1,0 +1,17 @@
+
+
+/* Bestseller List ============================================================================== */
+
+.bestsellerItem {
+  margin-bottom: 12px;
+}
+
+.bestsellerTitle {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.bestsellerAuthor {
+  font-style: italic;
+}
+
