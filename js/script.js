@@ -1,9 +1,13 @@
 $( document ).ready(function() {
 
+  var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
+  var name = result.length
 
-  bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
-    $('#hiUser').html("Hi, " + result)
-	  console.log("Hi "+result);                          
+ if (name != 0) {
+      $('#hiUser').html("Hi, " + result);
+    } else 
+      $('#hiUser').html("Hi, party pooper");
+      
 	});
 
   $("#rondellCarousel").rondell({
