@@ -1,4 +1,4 @@
-<h1>Magazine Project</h1>
+<h1>LiveCatalog</h1>
 
 <h2>General Project Summary</h2>
 
@@ -24,7 +24,7 @@
 
 <h4>Deployed Link</h4>
 
-http://my.herokuapp.com/
+<a href="http://enigmatic-reef-5753.herokuapp.com/">http://enigmatic-reef-5753.herokuapp.com/</a>
 
 <h4>API's Used</h4>
 
