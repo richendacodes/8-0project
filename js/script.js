@@ -10,8 +10,8 @@ $( document ).ready(function() {
       
 	});
 
-
-
-
+  $("#rondellCarousel").rondell({
+      preset: "carousel",
+    });
 
 });
