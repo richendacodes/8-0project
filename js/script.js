@@ -1,6 +1,8 @@
-var NYTBESTSELLERURL = "http://api.nytimes.com/svc/books/v3/lists/best-sellers";
+var NYTURL = "http://api.nytimes.com/svc/books/v3/lists";
+var EBOOKFICTIONNYTLIST = NYTURL+"/e-book-fiction.json"
 var FIREBASEURL = "https://livecatalog.firebaseio.com/";
 var myFirebaseRef;
+
 
 $( document ).ready(function() {
 	myFirebaseRef = new Firebase(FIREBASEURL);
@@ -12,16 +14,20 @@ $( document ).ready(function() {
 });
 
 function getBestSellers(){
+  var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
 
-	$.ajax({
-		url: NYTBESTSELLERURL,
-		dataType:"json",
-		type:"GET",
-		success:function(data){
-			 console.log(data);
-		}
+    var nytBestSellerUrl = EBOOKFICTIONNYTLIST+"?" + "api-key="+snapshot.val();
+    $.ajax({
+      url: nytBestSellerUrl,
+      dataType: "json",
+      type: "GET",
+      success: function (data) {
+        console.log(data);
+      }
 
-	});
+    });
+
+  });
 
 }
 
