@@ -1,0 +1,6 @@
+{
+  "hardcover-fiction":"http://api.nytimes.com/svc/books/v3/lists/hardcover-fiction.json",
+  "trade-fiction-paperback":"http://api.nytimes.com/svc/books/v3/lists/trade-fiction-paperback.json",
+  "e-book-fiction":"http://api.nytimes.com/svc/books/v3/lists/e-book-fiction.json",
+  "mass-market-paperback":"http://api.nytimes.com/svc/books/v3/lists/mass-market-paperback.json"
+}
