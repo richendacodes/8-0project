@@ -1,15 +1,17 @@
 $( document ).ready(function() {
 
+  var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
+  var name = result.length
 
-  bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
-    var result = result;
-    if ($result.length <= 0)
-        console.log('Sorry');
-      else
-
-    $('#hiUser').html("Hi, " + result)
-	  console.log("Hi "+result);                          
+ if (name != 0) {
+      $('#hiUser').html("Hi, " + result);
+    } else 
+      $('#hiUser').html("Hi, party pooper");
+      
 	});
+
+
+
 
 
 });
