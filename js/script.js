@@ -1,5 +1,5 @@
 $( document ).ready(function() {
-	$("#rondellCarousel").rondell({
+  $("#rondellCarousel").rondell({
     preset: "carousel",
   });
 
