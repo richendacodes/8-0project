@@ -1,28 +1,67 @@
-var NYTURL = "http://api.nytimes.com/svc/books/v3/lists";
-var EBOOKFICTIONNYTLIST = NYTURL+"/e-book-fiction.json"
 var FIREBASEURL = "https://livecatalog.firebaseio.com/";
 var myFirebaseRef;
+var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fiction','mass-market-paperback',
+  'hardcover-nonfiction','e-book-nonfiction'];
+var loadCounter;
 
 
-$( document ).ready(function() {
-	myFirebaseRef = new Firebase(FIREBASEURL);
-  bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {                
-	  console.log("Hi "+result);                          
-	});
-	getBestSellers();
+$( document ).ready(theMainFunction);
 
-});
 
-function getBestSellers(){
+function theMainFunction() {
+  myFirebaseRef = new Firebase(FIREBASEURL);
+  loadCounter = nytcategoryArray.length;
+
+  bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function (result) {
+    console.log("Hi " + result);
+  });
+
+
+  $.ajax({
+    url:"js/categorybooklist.json",
+    dataType:"json",
+    type:"GET",
+    success: function(data){
+      for(var i = 0; i < nytcategoryArray.length; i++){
+        getBestSellersAndFillCarousel(data[nytcategoryArray[i]]);
+
+      }
+
+
+    }
+  });
+
+}
+
+function getBestSellersAndFillCarousel(nytUrl){
+
   var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
-
-    var nytBestSellerUrl = EBOOKFICTIONNYTLIST+"?" + "api-key="+snapshot.val();
+    nytUrl+="?"+"api-key="+snapshot.val();
     $.ajax({
-      url: nytBestSellerUrl,
+      url: nytUrl,
       dataType: "json",
       type: "GET",
       success: function (data) {
-        console.log(data);
+        var anchor = $('<a>');
+        anchor.attr("rel","rondell");
+        anchor.attr("href","#");
+        var img = $('<img>');
+        img.attr("src",data["results"]["books"]["0"]["book_image"]);
+        img.addClass("resizeable");
+        anchor.append(img);
+
+        $('#rondellcarousel').append(anchor);
+
+        if((--loadCounter) == 0){
+          $('#rondellcarousel').rondell({
+            preset: "carousel"
+          });
+        }
+
+      },
+
+      error: function(){
+        console.log("puff");
       }
 
     });
@@ -30,4 +69,6 @@ function getBestSellers(){
   });
 
 }
+
+
 
