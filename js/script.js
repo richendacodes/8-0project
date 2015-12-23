@@ -73,31 +73,31 @@ function getBestSellersAndFillCarousel(nytUrl){
 
 function getProductDetails(data){
 
-  var bookName = data["results"]["books"]["0"]["title"];
-  var bookTitle = bookName.split(' ').join("+");
+  var bookName = data["results"]["books"]["0"]["title"].toLowerCase();
+  var modBookTitle = bookName.split(' ').join("+");
 
+  var paperBack = bookName + " (Paperback)";
+  var hardCover = bookName + " (Hardcover)";
+  var compactDics = bookName + " (Compact Disc)";
 
-  console.log("title: " + bookTitle);
+  console.log("title: " + modBookTitle);
 
   $.ajax({
     type: "GET",
     typeData:"json",
-    url: shopApiUrl+bookTitle,
+    url: shopApiUrl+modBookTitle,
     success: function(data){
 
-      //console.log(hardCover);
-      //console.log(hardCover.length);
-      //for(var i = 0; i < data.searchItems.length; i++) {
+      for(var i = 0; i < data.searchItems.length; i++) {
 
-        //console.log(data.searchItems[i]);
-        //console.log(data.searchItems[i].caption.substring(0, hardCover.length));
-        //console.log("Object #" + i + data.searchItems[i].caption);
-      //}
+        if(hardCover.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, (hardCover.length + 1))) {
+          console.log("WHAT:                   " + hardCover + data.searchItems[i].caption);
+        }
 
-
-      /*if(hardCover == data.searchItems[0].caption.substring(0, hardCover.length)){
-        console.log("what!");
-      }*/
+        if(paperBack.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, paperBack.length + 1)){
+          console.log("WHAT2:                   " + paperBack + data.searchItems[i].caption);
+        }
+      }
 
     }
 
