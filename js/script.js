@@ -91,11 +91,11 @@ function getProductDetails(data){
       for(var i = 0; i < data.searchItems.length; i++) {
 
         if(hardCover.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, (hardCover.length + 1))) {
-          console.log("WHAT:                   " + hardCover + data.searchItems[i].caption);
+          console.log("                         " + hardCover + data.searchItems[i].caption);
         }
 
         if(paperBack.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, paperBack.length + 1)){
-          console.log("WHAT2:                   " + paperBack + data.searchItems[i].caption);
+          console.log("                         " + paperBack + data.searchItems[i].caption);
         }
       }
 
