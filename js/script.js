@@ -3,7 +3,7 @@ var myFirebaseRef;
 var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fiction','mass-market-paperback',
   'hardcover-nonfiction','e-book-nonfiction'];
 var loadCounter;
-
+var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
 
 $( document ).ready(theMainFunction);
 
@@ -26,12 +26,12 @@ function theMainFunction() {
         getBestSellersAndFillCarousel(data[nytcategoryArray[i]]);
 
       }
-
-
     }
+
   });
 
 }
+
 
 function getBestSellersAndFillCarousel(nytUrl){
 
@@ -51,6 +51,7 @@ function getBestSellersAndFillCarousel(nytUrl){
         anchor.append(img);
 
         $('#rondellcarousel').append(anchor);
+        getProductDetails(data);
 
         if((--loadCounter) == 0){
           $('#rondellcarousel').rondell({
@@ -70,5 +71,38 @@ function getBestSellersAndFillCarousel(nytUrl){
 
 }
 
+function getProductDetails(data){
+
+  var bookName = data["results"]["books"]["0"]["title"].toLowerCase();
+  var modBookTitle = bookName.split(' ').join("+");
+
+  var paperBack = bookName + " (Paperback)";
+  var hardCover = bookName + " (Hardcover)";
+  var compactDics = bookName + " (Compact Disc)";
+
+  console.log("title: " + modBookTitle);
+
+  $.ajax({
+    type: "GET",
+    typeData:"json",
+    url: shopApiUrl+modBookTitle,
+    success: function(data){
+
+      for(var i = 0; i < data.searchItems.length; i++) {
+
+        if(hardCover.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, (hardCover.length + 1))) {
+          console.log("                         " + hardCover + data.searchItems[i].caption);
+        }
+
+        if(paperBack.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, paperBack.length + 1)){
+          console.log("                         " + paperBack + data.searchItems[i].caption);
+        }
+      }
+
+    }
+
+  });
+
+}
 
 
