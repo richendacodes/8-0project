@@ -2,6 +2,7 @@ var FIREBASEURL = "https://livecatalog.firebaseio.com/";
 var myFirebaseRef;
 var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fiction','mass-market-paperback',
   'hardcover-nonfiction','e-book-nonfiction'];
+var nytBestSellingDict = {};
 var loadCounter;
 var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
 
@@ -47,11 +48,15 @@ function getBestSellersAndFillCarousel(nytUrl){
         anchor.attr("href","#");
         var img = $('<img>');
         img.attr("src",data["results"]["books"]["0"]["book_image"]);
+        anchor.val({"books":data["results"]["books"],
+                    "listing":data["results"]["list_name"]});
+        anchor.on("click",function(){callGetProductDetails(true)});
+        anchor.on("click",fillBestSellersListing);
+        console.log(data);
         img.addClass("resizeable");
         anchor.append(img);
 
         $('#rondellcarousel').append(anchor);
-        getProductDetails(data);
 
         if((--loadCounter) == 0){
           $('#rondellcarousel').rondell({
@@ -69,6 +74,38 @@ function getBestSellersAndFillCarousel(nytUrl){
 
   });
 
+}
+
+function callGetProductDetails(isMany){
+  if(isMany)
+    getProductDetails($(this).val()["books"]["0"]);
+  else
+    getProductDetails($(this).val());
+}
+
+function fillBestSellersListing(){
+  var books = $(this).val()["books"];
+  var listing = $(this).val()["listing"];
+  $('#bestsellerList').find('.panel-heading').find('h4').html(listing);
+  $('#bestsellerList').find('.panel-body').empty();
+
+  for(var i = 1; i < books.length; i++){
+    var div = $('<div>');
+    div.addClass("bestsellerItem");
+    var span = $('<span>');
+    span.append(books[""+i]["title"]);
+    span.addClass("bestsellerTitle");
+    div.append(span);
+    div.append("<br>");
+    span = $('<span>');
+    span.addClass("bestsellerAuthor");
+    span.append(books[""+i]["author"]);
+    div.append(span);
+    div.val(books[""+i]);
+    div.on("click",function(){callGetProductDetails(false)});
+    $('#bestsellerList').find('.panel-body').append(div);
+
+  }
 }
 
 function getProductDetails(data){
