@@ -100,7 +100,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         displayReferencedImages: true
       },
       imageFiletypes: ['png', 'jpg', 'jpeg', 'gif', 'bmp'],
-      repeating: true,
+      repeating: false,
       wrapIndices: true,
       switchIndices: false,
       alwaysShowCaption: false,
