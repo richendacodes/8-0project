@@ -50,6 +50,8 @@ function getBestSellersAndFillCarousel(nytUrl){
         img.addClass("resizeable");
         anchor.append(img);
 
+        console.log(data["results"]["books"]["0"]);
+
         $('#rondellcarousel').append(anchor);
         getProductDetails(data);
 
@@ -74,11 +76,19 @@ function getBestSellersAndFillCarousel(nytUrl){
 function getProductDetails(data){
 
   var bookName = data["results"]["books"]["0"]["title"].toLowerCase();
+  var contributor = data["results"]["books"]["0"]["contributor"];
   var modBookTitle = bookName.split(' ').join("+");
 
   var paperBack = bookName + " (Paperback)";
   var hardCover = bookName + " (Hardcover)";
   var compactDics = bookName + " (Compact Disc)";
+  var isbn = data["results"]["books"]["0"]["primary_isbn13"];
+  var theDescription;
+  var splitDescription;
+  var splitAuthorName;
+  var author;
+
+
 
   console.log("title: " + modBookTitle);
 
@@ -88,14 +98,30 @@ function getProductDetails(data){
     url: shopApiUrl+modBookTitle,
     success: function(data){
 
+
+
       for(var i = 0; i < data.searchItems.length; i++) {
 
-        if(hardCover.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, (hardCover.length + 1))) {
-          console.log("                         " + hardCover + data.searchItems[i].caption);
-        }
+        if(isbn === data.searchItems[i].prods_CatalogSKU){
+          console.log("Found first try                         " + data.searchItems[i].caption);
+        }else {
 
-        if(paperBack.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, paperBack.length + 1)){
-          console.log("                         " + paperBack + data.searchItems[i].caption);
+          theDescription = data.searchItems[i].the_Description;
+          splitDescription = theDescription.split(" ", 3) + "";
+          splitAuthorName = splitDescription.split(/[;,]+/);
+          author = splitAuthorName[0] + " " + splitAuthorName[2] + " " + splitAuthorName[1];
+
+          if(hardCover.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, (hardCover.length + 1))) {
+            if( author === contributor){
+              console.log("Found second try                         " + hardCover + data.searchItems[i].caption);
+            }
+          }
+
+          if(paperBack.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, paperBack.length + 1)){
+            if( author === contributor) {
+              console.log("Found second try                         " + paperBack + data.searchItems[i].caption);
+            }
+          }
         }
       }
 
