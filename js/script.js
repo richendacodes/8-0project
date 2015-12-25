@@ -50,9 +50,9 @@ function getBestSellersAndFillCarousel(nytUrl){
         img.attr("src",data["results"]["books"]["0"]["book_image"]);
         anchor.val({"books":data["results"]["books"],
                     "listing":data["results"]["list_name"]});
-        anchor.on("click",function(){callGetProductDetails(true)});
+        anchor.on("click",function(){callGetProductDetails(this,true)});
         anchor.on("click",fillBestSellersListing);
-        console.log(data);
+        //console.log(data);
         img.addClass("resizeable");
         anchor.append(img);
 
@@ -76,9 +76,9 @@ function getBestSellersAndFillCarousel(nytUrl){
 
 }
 
-function callGetProductDetails(isMany){
+function callGetProductDetails(anchor,isMany){
   if(isMany)
-    getProductDetails($(this).val()["books"]["0"]);
+    getProductDetails($(anchor).val()["books"]["0"]);
   else
     getProductDetails($(this).val());
 }
@@ -110,7 +110,9 @@ function fillBestSellersListing(){
 
 function getProductDetails(data){
 
-  var bookName = data["results"]["books"]["0"]["title"].toLowerCase();
+
+  console.log(data.isbns[0]);
+  /*var bookName = data["results"]["books"]["0"]["title"].toLowerCase();
   var modBookTitle = bookName.split(' ').join("+");
 
   var paperBack = bookName + " (Paperback)";
@@ -138,7 +140,7 @@ function getProductDetails(data){
 
     }
 
-  });
+  });*/
 
 }
 
