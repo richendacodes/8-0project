@@ -80,7 +80,7 @@ function callGetProductDetails(anchor,isMany){
   if(isMany)
     getProductDetails($(anchor).val()["books"]["0"]);
   else
-    getProductDetails($(this).val());
+    getProductDetails($(anchor).val());
 }
 
 function fillBestSellersListing(){
@@ -102,7 +102,7 @@ function fillBestSellersListing(){
     span.append(books[""+i]["author"]);
     div.append(span);
     div.val(books[""+i]);
-    div.on("click",function(){callGetProductDetails(false)});
+    div.on("click",function(){callGetProductDetails(this,false)});
     $('#bestsellerList').find('.panel-body').append(div);
 
   }
@@ -110,37 +110,65 @@ function fillBestSellersListing(){
 
 function getProductDetails(data){
 
+  var nytTitle = data.title;
+  var nytAuthor = data.contributor;
+  var nytDescription = data.description;
+  var nytAmazonURL = data.amazon_product_url;
+  var nytTitleLowerCase = nytTitle.toLowerCase();
+  var bookTitle = nytTitleLowerCase.split(' ').join("+");
+  var theData = data;
 
-  console.log(data.isbns[0]);
-  /*var bookName = data["results"]["books"]["0"]["title"].toLowerCase();
-  var modBookTitle = bookName.split(' ').join("+");
-
-  var paperBack = bookName + " (Paperback)";
-  var hardCover = bookName + " (Hardcover)";
-  var compactDics = bookName + " (Compact Disc)";
-
-  console.log("title: " + modBookTitle);
+  console.log(data);
 
   $.ajax({
     type: "GET",
     typeData:"json",
-    url: shopApiUrl+modBookTitle,
+    url: shopApiUrl+bookTitle,
     success: function(data){
 
-      for(var i = 0; i < data.searchItems.length; i++) {
+      var breakNotifier = false;
+      var bookSearchItem;
+      var shopBookPrice;
+      var shopURL;
 
-        if(hardCover.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, (hardCover.length + 1))) {
-          console.log("                         " + hardCover + data.searchItems[i].caption);
+      console.log(data);
+      console.log(theData.isbns.length);
+      for(var i = 0; i < theData.isbns.length; i++) {
+
+        console.log(theData.isbns[i].isbn13);
+        for(var j = 0; j < data.searchItems.length; j++){
+
+
+          if((theData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
+            breakNotifier = true;
+            bookSearchItem = data.searchItems[j];
+            shopBookPrice = data.searchItems[j].priceInfo.price;
+            shopURL = data.searchItems[j].modelQuickViewDetails.linkUrl;
+            break;
+          }
         }
 
-        if(paperBack.toLowerCase() === data.searchItems[i].caption.toLowerCase().substring(0, paperBack.length + 1)){
-          console.log("                         " + paperBack + data.searchItems[i].caption);
+        if(breakNotifier == true){
+          break;
         }
       }
 
+      var img = $('<img>').attr("src", bookSearchItem.imageURI);
+
+      $("#bookInfoPanel").find(".bookImg").empty();
+      $("#bookInfoPanel").find(".bookImg").append(img);
+
+      $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
+      $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
+      $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
+      $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(nytDescription);
+
+      $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").text(shopBookPrice);
+      $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").attr("href", shopURL).attr("target", "_blank");
+      $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
     }
 
-  });*/
+  });
 
 }
 
