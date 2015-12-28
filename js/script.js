@@ -110,20 +110,24 @@ function fillBestSellersListing(){
 
 function getProductDetails(data){
 
-  var nytTitle = data.title;
-  var nytAuthor = data.contributor;
-  var nytDescription = data.description;
-  var nytAmazonURL = data.amazon_product_url;
-  var nytTitleLowerCase = nytTitle.toLowerCase();
-  var bookTitle = nytTitleLowerCase.split(' ').join("+");
   var theData = data;
+  var nytTitle = theData.title;
+  var nytAuthor = theData.contributor;
+  var nytDescription = theData.description;
+  var nytAmazonURL = theData.amazon_product_url;
+  var nytIsbn;
+
+  var nytTitleLowerCase = nytTitle.toLowerCase();
+  var bookTitleOnSplit = nytTitleLowerCase.split(' ');
+  var bookTitle = bookTitleOnSplit.join("+");
+
 
   console.log(data);
 
   $.ajax({
-    type: "GET",
-    typeData:"json",
     url: shopApiUrl+bookTitle,
+    dataType: "json",
+    type: "GET",
     success: function(data){
 
       var breakNotifier = false;
@@ -131,8 +135,9 @@ function getProductDetails(data){
       var shopBookPrice;
       var shopURL;
 
-      console.log(data);
-      console.log(theData.isbns.length);
+      //console.log(data);
+      //console.log(theData.isbns.length);
+
       for(var i = 0; i < theData.isbns.length; i++) {
 
         console.log(theData.isbns[i].isbn13);
@@ -144,6 +149,7 @@ function getProductDetails(data){
             bookSearchItem = data.searchItems[j];
             shopBookPrice = data.searchItems[j].priceInfo.price;
             shopURL = data.searchItems[j].modelQuickViewDetails.linkUrl;
+            nytIsbn = theData.isbns[i].isbn13;
             break;
           }
         }
@@ -153,19 +159,86 @@ function getProductDetails(data){
         }
       }
 
-      var img = $('<img>').attr("src", bookSearchItem.imageURI);
+      var googleBookDescription;
 
-      $("#bookInfoPanel").find(".bookImg").empty();
-      $("#bookInfoPanel").find(".bookImg").append(img);
+      $.ajax({
+        url: "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+inauthor:"+theData.author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM",
+        dataType: "json",
+        type: "GET",
+        success: function(data){
 
-      $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
-      $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
-      $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
-      $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(nytDescription);
+          var anotherBreak = false;
 
-      $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").text(shopBookPrice);
-      $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").attr("href", shopURL).attr("target", "_blank");
-      $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+          for(var i = 0; i < data.items.length; i++){
+            googleBookDescription = data.items[i].volumeInfo.description;
+            console.log("google description: " + googleBookDescription);
+            if(googleBookDescription !== undefined){
+
+              for(var j = 0; j < theData.isbns.length; j++){
+
+                if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
+
+                  if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+                    console.log("hello there1 " + theData.isbns[j].isbn13 + " " + data.items[i].volumeInfo.industryIdentifiers[0].identifier + " " + theData.primary_isbn13);
+
+                    anotherBreak = true;
+                    break;
+                  }
+                }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
+
+                  if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+                    console.log("hello there2 " + theData.isbns[j].isbn13 + " " + data.items[i].volumeInfo.industryIdentifiers[1].identifier + " " + theData.primary_isbn13);
+                    anotherBreak = true;
+                    break;
+                  }
+                }
+              }
+
+              if(anotherBreak === true){
+                console.log("BREAK!");
+                break;
+              }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
+                console.log("YES ANOTHER BREAK!");
+                break;
+              }
+
+
+              console.log(nytTitleLowerCase);
+              console.log(data.items[i].volumeInfo.title.toLowerCase());
+
+              console.log("hello");
+            }
+
+          }
+          //googleBookDescription = data.items[0].volumeInfo.description;
+
+          /*console.log(googleBookDescription);
+          if(googleBookDescription === undefined){
+
+            googleBookDescription = data.items[1].volumeInfo.description
+
+          }*/
+
+          /*if(breakNotifier == true){
+            var img = $('<img>').attr("src", bookSearchItem.imageURI);
+
+            $("#bookInfoPanel").find(".bookImg").empty();
+            $("#bookInfoPanel").find(".bookImg").append(img);
+
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
+
+            $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").text(shopBookPrice);
+            $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").attr("href", shopURL).attr("target", "_blank");
+            $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+          }else{
+
+          }*/
+        }
+      });
+
     }
 
   });
