@@ -171,7 +171,7 @@ function getProductDetails(data){
 
           for(var i = 0; i < data.items.length; i++){
             googleBookDescription = data.items[i].volumeInfo.description;
-            console.log("google description: " + googleBookDescription);
+
             if(googleBookDescription !== undefined){
 
               for(var j = 0; j < theData.isbns.length; j++){
@@ -179,15 +179,14 @@ function getProductDetails(data){
                 if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
 
                   if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-                    console.log("hello there1 " + theData.isbns[j].isbn13 + " " + data.items[i].volumeInfo.industryIdentifiers[0].identifier + " " + theData.primary_isbn13);
-
+                    googleBookDescription = data.items[i].volumeInfo.description;
                     anotherBreak = true;
                     break;
                   }
                 }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
 
                   if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-                    console.log("hello there2 " + theData.isbns[j].isbn13 + " " + data.items[i].volumeInfo.industryIdentifiers[1].identifier + " " + theData.primary_isbn13);
+                    googleBookDescription = data.items[i].volumeInfo.description;
                     anotherBreak = true;
                     break;
                   }
@@ -195,31 +194,16 @@ function getProductDetails(data){
               }
 
               if(anotherBreak === true){
-                console.log("BREAK!");
                 break;
               }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
-                console.log("YES ANOTHER BREAK!");
+                googleBookDescription = data.items[i].volumeInfo.description;
                 break;
               }
-
-
-              console.log(nytTitleLowerCase);
-              console.log(data.items[i].volumeInfo.title.toLowerCase());
-
-              console.log("hello");
             }
-
           }
-          //googleBookDescription = data.items[0].volumeInfo.description;
 
-          /*console.log(googleBookDescription);
-          if(googleBookDescription === undefined){
 
-            googleBookDescription = data.items[1].volumeInfo.description
-
-          }*/
-
-          /*if(breakNotifier == true){
+          if(breakNotifier == true){
             var img = $('<img>').attr("src", bookSearchItem.imageURI);
 
             $("#bookInfoPanel").find(".bookImg").empty();
@@ -235,7 +219,7 @@ function getProductDetails(data){
             $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
           }else{
 
-          }*/
+          }
         }
       });
 
