@@ -4,7 +4,28 @@ var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fi
   'hardcover-nonfiction','e-book-nonfiction'];
 var nytBestSellingDict = {};
 var loadCounter;
+
+
 var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
+var nytTitle;
+var nytAuthor;
+var nytAmazonURL;
+var nytImage;
+var nytTitleLowerCase;
+var bookTitleOnSplit;
+var bookTitle
+
+var theData;
+var breakNotifier;
+var anotherBreak;
+var bookSearchItem;
+var shopBookPrice;
+var shopURL;
+
+var googleBookDescription;
+var googleBookImage;
+
+
 
 $( document ).ready(theMainFunction);
 
@@ -76,12 +97,14 @@ function getBestSellersAndFillCarousel(nytUrl){
 
 }
 
+
 function callGetProductDetails(anchor,isMany){
   if(isMany)
     getProductDetails($(anchor).val()["books"]["0"]);
   else
     getProductDetails($(anchor).val());
 }
+
 
 function fillBestSellersListing(){
   var books = $(this).val()["books"];
@@ -108,18 +131,21 @@ function fillBestSellersListing(){
   }
 }
 
+
 function getProductDetails(data){
 
-  var theData = data;
-  var nytTitle = theData.title;
-  var nytAuthor = theData.contributor;
-  var nytAmazonURL = theData.amazon_product_url;
-  var nytImage = theData.book_image;
-  var nytIsbn;
+  theData = data;
+  breakNotifier = false;
+  anotherBreak = false;
+  nytTitle = theData.title;
+  nytAuthor = theData.contributor;
+  nytAmazonURL = theData.amazon_product_url;
+  nytImage = theData.book_image;
 
-  var nytTitleLowerCase = nytTitle.toLowerCase();
-  var bookTitleOnSplit = nytTitleLowerCase.split(' ');
-  var bookTitle = bookTitleOnSplit.join("+");
+
+  nytTitleLowerCase = nytTitle.toLowerCase();
+  bookTitleOnSplit = nytTitleLowerCase.split(' ');
+  bookTitle = bookTitleOnSplit.join("+");
 
 
   console.log(data);
@@ -128,133 +154,130 @@ function getProductDetails(data){
     url: shopApiUrl+bookTitle,
     dataType: "json",
     type: "GET",
-    success: function(data){
+    success: findProductInShop
 
-      var breakNotifier = false;
-      var bookSearchItem;
-      var shopBookPrice;
-      var shopURL;
+  });
+}
 
 
-      for(var i = 0; i < theData.isbns.length; i++) {
-        for(var j = 0; j < data.searchItems.length; j++){
+function findProductInShop(data){
 
-          if((theData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
-            breakNotifier = true;
-            bookSearchItem = data.searchItems[j];
-            shopBookPrice = data.searchItems[j].priceInfo.price;
-            shopURL = data.searchItems[j].modelQuickViewDetails.linkUrl;
-            nytIsbn = theData.isbns[i].isbn13;
+  for(var i = 0; i < theData.isbns.length; i++) {
+    for(var j = 0; j < data.searchItems.length; j++){
+
+      if((theData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
+        breakNotifier = true;
+        bookSearchItem = data.searchItems[j];
+        shopBookPrice = data.searchItems[j].priceInfo.price;
+        shopURL = data.searchItems[j].modelQuickViewDetails.linkUrl;
+        break;
+      }
+    }
+
+    if(breakNotifier == true){
+      break;
+    }
+  }
+
+
+  $.ajax({
+    url: "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+inauthor:"+theData.author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM",
+    dataType: "json",
+    type: "GET",
+    success: findBookInfoInGoogleBooks
+
+  });
+}
+
+
+function findBookInfoInGoogleBooks(data){
+
+  for(var i = 0; i < data.items.length; i++){
+    googleBookDescription = data.items[i].volumeInfo.description;
+
+    if(googleBookDescription !== undefined){
+
+      for(var j = 0; j < theData.isbns.length; j++){
+
+        if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
+
+          if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+            googleBookDescription = data.items[i].volumeInfo.description;
+            googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
+            anotherBreak = true;
+            break;
+          }
+        }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
+
+          if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+            googleBookDescription = data.items[i].volumeInfo.description;
+            googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
+            anotherBreak = true;
             break;
           }
         }
-
-        if(breakNotifier == true){
-          break;
-        }
       }
 
-      var googleBookDescription;
-      var googleBookImage;
-
-      $.ajax({
-        url: "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+inauthor:"+theData.author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM",
-        dataType: "json",
-        type: "GET",
-        success: function(data){
-
-          var anotherBreak = false;
-
-          for(var i = 0; i < data.items.length; i++){
-            googleBookDescription = data.items[i].volumeInfo.description;
-
-            if(googleBookDescription !== undefined){
-
-              for(var j = 0; j < theData.isbns.length; j++){
-
-                if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
-
-                  if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-                    googleBookDescription = data.items[i].volumeInfo.description;
-                    googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-                    anotherBreak = true;
-                    break;
-                  }
-                }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
-
-                  if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-                    googleBookDescription = data.items[i].volumeInfo.description;
-                    googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-                    anotherBreak = true;
-                    break;
-                  }
-                }
-              }
-
-              if(anotherBreak === true){
-                anotherBreak = true;
-                break;
-              }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
-                googleBookDescription = data.items[i].volumeInfo.description;
-                googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-                anotherBreak = true;
-                break;
-              }
-            }
-          }
-
-          console.log(anotherBreak);
-          console.log(breakNotifier);
-          if(breakNotifier === false && anotherBreak === false){
-            var img = $('<img>').attr("src", nytImage).addClass("resize");
-
-            $("#bookInfoPanel").find(".bookImg").empty();
-            $("#bookInfoPanel").find(".bookImg").append(img);
-
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text("No description available at this time...");
-
-            $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
-            $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
-            $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
-          }else if(breakNotifier === true){
-            var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
-
-            $("#bookInfoPanel").find(".bookImg").empty();
-            $("#bookInfoPanel").find(".bookImg").append(img);
-
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
-
-            $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").show().text(shopBookPrice);
-            $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").show().attr("href", shopURL).attr("target", "_blank");
-            $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
-          }else{
-            var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
-
-            $("#bookInfoPanel").find(".bookImg").empty();
-            $("#bookInfoPanel").find(".bookImg").append(img);
-
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
-            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
-
-            $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
-            $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
-            $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
-          }
-        }
-      });
-
+      if(anotherBreak === true){
+        anotherBreak = true;
+        break;
+      }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
+        googleBookDescription = data.items[i].volumeInfo.description;
+        googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
+        anotherBreak = true;
+        break;
+      }
     }
+  }
 
-  });
+  displayContent();
 
 }
 
 
+function displayContent(){
+
+  if(breakNotifier === false && anotherBreak === false){
+    var img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
+
+    $("#bookInfoPanel").find(".bookImg").empty();
+    $("#bookInfoPanel").find(".bookImg").append(img);
+
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text("No description available at this time...");
+
+    $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
+    $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
+    $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+  }else if(breakNotifier === true){
+    var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
+
+    $("#bookInfoPanel").find(".bookImg").empty();
+    $("#bookInfoPanel").find(".bookImg").append(img);
+
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
+
+    $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").show().text(shopBookPrice);
+    $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").show().attr("href", shopURL).attr("target", "_blank");
+    $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+  }else{
+    var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
+
+    $("#bookInfoPanel").find(".bookImg").empty();
+    $("#bookInfoPanel").find(".bookImg").append(img);
+
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
+    $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
+
+    $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
+    $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
+    $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+  }
+}
