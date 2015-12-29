@@ -113,8 +113,8 @@ function getProductDetails(data){
   var theData = data;
   var nytTitle = theData.title;
   var nytAuthor = theData.contributor;
-  var nytDescription = theData.description;
   var nytAmazonURL = theData.amazon_product_url;
+  var nytImage = theData.book_image;
   var nytIsbn;
 
   var nytTitleLowerCase = nytTitle.toLowerCase();
@@ -135,14 +135,9 @@ function getProductDetails(data){
       var shopBookPrice;
       var shopURL;
 
-      //console.log(data);
-      //console.log(theData.isbns.length);
 
       for(var i = 0; i < theData.isbns.length; i++) {
-
-        console.log(theData.isbns[i].isbn13);
         for(var j = 0; j < data.searchItems.length; j++){
-
 
           if((theData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
             breakNotifier = true;
@@ -204,7 +199,7 @@ function getProductDetails(data){
 
 
           if(breakNotifier == true){
-            var img = $('<img>').attr("src", bookSearchItem.imageURI);
+            var img = $('<img>').attr("src", nytImage);
 
             $("#bookInfoPanel").find(".bookImg").empty();
             $("#bookInfoPanel").find(".bookImg").append(img);
@@ -214,11 +209,23 @@ function getProductDetails(data){
             $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
             $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
 
-            $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").text(shopBookPrice);
-            $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").attr("href", shopURL).attr("target", "_blank");
+            $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").show().text(shopBookPrice);
+            $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").show().attr("href", shopURL).attr("target", "_blank");
             $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
           }else{
+            var img = $('<img>').attr("src", nytImage);
 
+            $("#bookInfoPanel").find(".bookImg").empty();
+            $("#bookInfoPanel").find(".bookImg").append(img);
+
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
+            $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
+
+            $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
+            $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
+            $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
           }
         }
       });
