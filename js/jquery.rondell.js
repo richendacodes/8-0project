@@ -65,7 +65,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     },
     defaults: {
       showContainer: true,
-      currentLayer: 0,
+      currentLayer: 3,
       radius: {
         x: 250,
         y: 50
@@ -96,8 +96,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
       },
       lightbox: {
-        enabled: true,
-        displayReferencedImages: true
+        enabled: false,
+        displayReferencedImages: false
       },
       imageFiletypes: ['png', 'jpg', 'jpeg', 'gif', 'bmp'],
       repeating: false,
@@ -1495,7 +1495,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
       },
       randomStart: true,
-      currentLayer: 1,
+      currentLayer: 3,
       funcSize: function(l, r, i) {
         return 1 / Math.abs(l);
       }
@@ -1677,7 +1677,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       },
       visibleItems: 9,
       wrapIndices: false,
-      currentLayer: 1,
+      currentLayer: 3,
       switchIndices: true,
       cropThumbnails: true,
       center: {
