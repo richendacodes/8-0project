@@ -11,8 +11,13 @@ var nytTitle;
 var nytAuthor;
 var nytAmazonURL;
 var nytImage;
+var nytTitleLowerCase;
+var bookTitleOnSplit;
+var bookTitle
 
-var breakNotifier = false;
+var theData;
+var breakNotifier;
+var anotherBreak;
 var bookSearchItem;
 var shopBookPrice;
 var shopURL;
@@ -92,12 +97,14 @@ function getBestSellersAndFillCarousel(nytUrl){
 
 }
 
+
 function callGetProductDetails(anchor,isMany){
   if(isMany)
     getProductDetails($(anchor).val()["books"]["0"]);
   else
     getProductDetails($(anchor).val());
 }
+
 
 function fillBestSellersListing(){
   var books = $(this).val()["books"];
@@ -124,18 +131,21 @@ function fillBestSellersListing(){
   }
 }
 
+
 function getProductDetails(data){
 
-  var theData = data;
+  theData = data;
+  breakNotifier = false;
+  anotherBreak = false;
   nytTitle = theData.title;
   nytAuthor = theData.contributor;
   nytAmazonURL = theData.amazon_product_url;
   nytImage = theData.book_image;
-  var nytIsbn;
 
-  var nytTitleLowerCase = nytTitle.toLowerCase();
-  var bookTitleOnSplit = nytTitleLowerCase.split(' ');
-  var bookTitle = bookTitleOnSplit.join("+");
+
+  nytTitleLowerCase = nytTitle.toLowerCase();
+  bookTitleOnSplit = nytTitleLowerCase.split(' ');
+  bookTitle = bookTitleOnSplit.join("+");
 
 
   console.log(data);
@@ -144,83 +154,88 @@ function getProductDetails(data){
     url: shopApiUrl+bookTitle,
     dataType: "json",
     type: "GET",
-    success: function(data){
+    success: findProductInShop
 
-
-      for(var i = 0; i < theData.isbns.length; i++) {
-        for(var j = 0; j < data.searchItems.length; j++){
-
-          if((theData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
-            breakNotifier = true;
-            bookSearchItem = data.searchItems[j];
-            shopBookPrice = data.searchItems[j].priceInfo.price;
-            shopURL = data.searchItems[j].modelQuickViewDetails.linkUrl;
-            nytIsbn = theData.isbns[i].isbn13;
-            break;
-          }
-        }
-
-        if(breakNotifier == true){
-          break;
-        }
-      }
-
-
-      $.ajax({
-        url: "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+inauthor:"+theData.author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM",
-        dataType: "json",
-        type: "GET",
-        success: function(data){
-
-          var anotherBreak = false;
-
-          for(var i = 0; i < data.items.length; i++){
-            googleBookDescription = data.items[i].volumeInfo.description;
-
-            if(googleBookDescription !== undefined){
-
-              for(var j = 0; j < theData.isbns.length; j++){
-
-                if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
-
-                  if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-                    googleBookDescription = data.items[i].volumeInfo.description;
-                    googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-                    anotherBreak = true;
-                    break;
-                  }
-                }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
-
-                  if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-                    googleBookDescription = data.items[i].volumeInfo.description;
-                    googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-                    anotherBreak = true;
-                    break;
-                  }
-                }
-              }
-
-              if(anotherBreak === true){
-                anotherBreak = true;
-                break;
-              }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
-                googleBookDescription = data.items[i].volumeInfo.description;
-                googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-                anotherBreak = true;
-                break;
-              }
-            }
-          }
-
-          displayContent(anotherBreak, breakNotifier);
-        }
-      });
-    }
   });
 }
 
 
-function displayContent(anotherBreak, breakNotifier){
+function findProductInShop(data){
+
+  for(var i = 0; i < theData.isbns.length; i++) {
+    for(var j = 0; j < data.searchItems.length; j++){
+
+      if((theData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
+        breakNotifier = true;
+        bookSearchItem = data.searchItems[j];
+        shopBookPrice = data.searchItems[j].priceInfo.price;
+        shopURL = data.searchItems[j].modelQuickViewDetails.linkUrl;
+        break;
+      }
+    }
+
+    if(breakNotifier == true){
+      break;
+    }
+  }
+
+
+  $.ajax({
+    url: "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+inauthor:"+theData.author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM",
+    dataType: "json",
+    type: "GET",
+    success: findBookInfoInGoogleBooks
+
+  });
+}
+
+
+function findBookInfoInGoogleBooks(data){
+
+  for(var i = 0; i < data.items.length; i++){
+    googleBookDescription = data.items[i].volumeInfo.description;
+
+    if(googleBookDescription !== undefined){
+
+      for(var j = 0; j < theData.isbns.length; j++){
+
+        if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
+
+          if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+            googleBookDescription = data.items[i].volumeInfo.description;
+            googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
+            anotherBreak = true;
+            break;
+          }
+        }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
+
+          if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+            googleBookDescription = data.items[i].volumeInfo.description;
+            googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
+            anotherBreak = true;
+            break;
+          }
+        }
+      }
+
+      if(anotherBreak === true){
+        anotherBreak = true;
+        break;
+      }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
+        googleBookDescription = data.items[i].volumeInfo.description;
+        googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
+        anotherBreak = true;
+        break;
+      }
+    }
+  }
+
+  displayContent();
+
+}
+
+
+function displayContent(){
 
   if(breakNotifier === false && anotherBreak === false){
     var img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
