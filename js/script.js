@@ -43,6 +43,7 @@ function getBestSellersAndFillCarousel(nytUrl){
       dataType: "json",
       type: "GET",
       success: function (data) {
+        console.log(data);
         var anchor = $('<a>');
         anchor.attr("rel","rondell");
         anchor.attr("href","#");
@@ -61,13 +62,14 @@ function getBestSellersAndFillCarousel(nytUrl){
         if((--loadCounter) == 0){
           $('#rondellcarousel').rondell({
             preset: "carousel"
-          });
+          },function(){},function(){console.log($('#rondellcarousel').find('.rondell-item-focused').trigger("click"))});
+
         }
 
       },
 
       error: function(){
-        console.log("puff");
+
       }
 
     });

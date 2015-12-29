@@ -185,10 +185,11 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     Rondell.activeRondell = null;
 
-    function Rondell(container, options, initCallback) {
+    function Rondell(container, options, initCallback, endCallback) {
       var children, item, presetOptions, scrollbarContainer, _i, _len;
       this.container = container;
       this.initCallback = initCallback != null ? initCallback : void 0;
+      this.endCallback = endCallback != null ? endCallback: void 0;
       this.showLightbox = __bind(this.showLightbox, this);
       this.keyDown = __bind(this.keyDown, this);
       this.isFocused = __bind(this.isFocused, this);
@@ -275,6 +276,9 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       if (this.showContainer) {
         this.container.show();
       }
+
+
+
     }
 
     Rondell.prototype.update = function(options) {
@@ -1109,6 +1113,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           }
         }
       }
+
+
       return this.rondell.onItemInit(this.id);
     };
 
@@ -1258,6 +1264,12 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           return this.object.css("display", "block");
         }
       }
+
+      if(typeof this.rondell.endCallback === "function"){
+        this.rondell.endCallback(this);
+      }
+
+
     };
 
     RondellItem.prototype.runAnimation = function(force) {
@@ -1439,7 +1451,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     return RondellScrollbar;
 
   })();
-  return $.fn.rondell = function(options, callback) {
+  return $.fn.rondell = function(options, callback, endcallback) {
     var self;
     if (options == null) {
       options = {};
@@ -1450,10 +1462,10 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     self = $(this);
     if (this.length > 1) {
       this.each(function() {
-        return self.rondell(options, callback);
+        return self.rondell(options, callback,endcallback);
       });
     } else if (self.data('rondell') === void 0) {
-      new Rondell(this, options, callback);
+      new Rondell(this, options, callback,endcallback);
     } else {
       self.data('rondell').update(options);
     }
