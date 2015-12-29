@@ -1475,7 +1475,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   return $.rondell.presets = {
     carousel: {
       autoRotation: {
-        enabled: true,
+        enabled: false,
         direction: 1,
         once: false,
         delay: 5000
@@ -1754,7 +1754,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       fadeTime: 1000,
       opacityMin: 0.01,
       autoRotation: {
-        enabled: true
+        enabled: false
       },
       center: {
         top: 150,
