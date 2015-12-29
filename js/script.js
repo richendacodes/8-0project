@@ -83,7 +83,7 @@ function getBestSellersAndFillCarousel(nytUrl){
         if((--loadCounter) == 0){
           $('#rondellcarousel').rondell({
             preset: "carousel"
-          },function(){},function(){console.log($('#rondellcarousel').find('.rondell-item-focused').trigger("click"))});
+          },function(){},function(){$('#rondellcarousel').find('.rondell-item-focused').trigger("click")});
 
         }
 
