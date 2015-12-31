@@ -5,15 +5,16 @@ var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fi
 var nytBestSellingDict = {};
 var loadCounter;
 
-
 var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
+var fullShopApiUrl;
+var fullGoogleApiUrl;
 var nytTitle;
 var nytAuthor;
 var nytAmazonURL;
 var nytImage;
 var nytTitleLowerCase;
 var bookTitleOnSplit;
-var bookTitle
+var bookTitle;
 
 var theData;
 var breakNotifier;
@@ -25,7 +26,8 @@ var shopURL;
 var googleBookDescription;
 var googleBookImage;
 
-
+var myProductHash = {};
+var myGoogleHash = {};
 
 $( document ).ready(theMainFunction);
 
@@ -86,17 +88,9 @@ function getBestSellersAndFillCarousel(nytUrl){
           },function(){},function(){$('#rondellcarousel').find('.rondell-item-focused').trigger("click")});
 
         }
-
-      },
-
-      error: function(){
-
       }
-
     });
-
   });
-
 }
 
 
@@ -144,25 +138,39 @@ function getProductDetails(data){
   nytAmazonURL = theData.amazon_product_url;
   nytImage = theData.book_image;
 
-
   nytTitleLowerCase = nytTitle.toLowerCase();
   bookTitleOnSplit = nytTitleLowerCase.split(' ');
   bookTitle = bookTitleOnSplit.join("+");
 
-
   console.log(data);
+  fullShopApiUrl = shopApiUrl+bookTitle;
 
-  $.ajax({
-    url: shopApiUrl+bookTitle,
-    dataType: "json",
-    type: "GET",
-    success: findProductInShop
 
-  });
+  if(myProductHash[fullShopApiUrl] === undefined){
+    $.ajax({
+      url: fullShopApiUrl,
+      dataType: "json",
+      type: "GET",
+      success: findProductInShop
+
+    });
+  }else{
+    findProductInShopHandler(myProductHash[fullShopApiUrl]);
+  }
+
 }
 
 
 function findProductInShop(data){
+
+  myProductHash[fullShopApiUrl] = data;
+  findProductInShopHandler(myProductHash[fullShopApiUrl]);
+}
+
+
+function findProductInShopHandler(data){
+  console.log(data.searchItems.length);
+  fullGoogleApiUrl = "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+inauthor:"+theData.author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM";
 
   for(var i = 0; i < theData.isbns.length; i++) {
     for(var j = 0; j < data.searchItems.length; j++){
@@ -181,18 +189,21 @@ function findProductInShop(data){
     }
   }
 
+  if(myGoogleHash[fullGoogleApiUrl] === undefined) {
+    $.ajax({
+      url: fullGoogleApiUrl,
+      dataType: "json",
+      type: "GET",
+      success: findBookInfoInGoogleBooks
 
-  $.ajax({
-    url: "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+inauthor:"+theData.author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM",
-    dataType: "json",
-    type: "GET",
-    success: findBookInfoInGoogleBooks
-
-  });
+    });
+  }else{
+    findBookInfoInGoogleBooksHandler(myGoogleHash[fullGoogleApiUrl]);
+  }
 }
 
 
-function findBookInfoInGoogleBooks(data){
+function findBookInfoInGoogleBooksHandler(data){
 
   for(var i = 0; i < data.items.length; i++){
     googleBookDescription = data.items[i].volumeInfo.description;
@@ -233,6 +244,13 @@ function findBookInfoInGoogleBooks(data){
   }
 
   displayContent();
+}
+
+
+function findBookInfoInGoogleBooks(data){
+
+  myGoogleHash[fullGoogleApiUrl] = data;
+  findBookInfoInGoogleBooksHandler(myGoogleHash[fullGoogleApiUrl]);
 
 }
 
@@ -282,4 +300,5 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
     $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
   }
+
 }
