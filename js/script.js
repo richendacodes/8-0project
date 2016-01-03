@@ -227,7 +227,9 @@ function findBookInfoInGoogleBooksHandler(data){
 
       for(var j = 0; j < theData.isbns.length; j++){
 
-        if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
+        if(data.items[i].volumeInfo.industryIdentifiers === undefined){
+          continue;
+        }if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
 
           if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
             googleBookDescription = data.items[i].volumeInfo.description;
