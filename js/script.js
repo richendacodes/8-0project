@@ -1,12 +1,11 @@
 var FIREBASEURL = "https://livecatalog.firebaseio.com/";
 var myFirebaseRef;
 var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fiction','mass-market-paperback',
-  'hardcover-nonfiction','e-book-nonfiction'];
+  'hardcover-nonfiction','e-book-nonfiction','paperback-nonfiction','advice-how-to-and-miscellaneous'];
 var nytBestSellingDict = {};
 var loadCounter;
 
 var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
-var nytReviewsApiUrl = "http://api.nytimes.com/svc/books/v3/reviews.json?"
 var fullShopApiUrl;
 var fullGoogleApiUrl;
 var nytTitle;
@@ -77,7 +76,10 @@ function theMainFunction() {
 function getBestSellersAndFillCarousel(nytUrl){
 
   var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
-    nytUrl+="?"+"api-key="+snapshot.val();
+    var key = snapshot.val();
+    key = key.replace(/:/g,"%3A");
+    nytUrl+="?"+"api-key="+key;
+    console.log(nytUrl);
     $.ajax({
       url: nytUrl,
       dataType: "json",
@@ -207,6 +209,8 @@ function findProductInShopHandler(data){
   }
 
   if(myGoogleHash[fullGoogleApiUrl] === undefined) {
+    console.log(fullGoogleApiUrl);
+    fullGoogleApiUrl = fullGoogleApiUrl.replace(/ /g,"%20");
     $.ajax({
       url: fullGoogleApiUrl,
       dataType: "json",
@@ -215,13 +219,14 @@ function findProductInShopHandler(data){
 
     });
   }else{
+    console.log("here2");
     findBookInfoInGoogleBooksHandler(myGoogleHash[fullGoogleApiUrl]);
   }
 }
 
 
 function findBookInfoInGoogleBooksHandler(data){
-
+  console.log(data.items);
   for(var i = 0; i < data.items.length; i++){
     googleBookDescription = data.items[i].volumeInfo.description;
 
@@ -230,18 +235,25 @@ function findBookInfoInGoogleBooksHandler(data){
       for(var j = 0; j < theData.isbns.length; j++){
 
         if(data.items[i].volumeInfo.industryIdentifiers === undefined){
+          console.log("industries undefined");
           continue;
         }if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
-
+          console.log("something klk");
           if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+            console.log("something");
             googleBookDescription = data.items[i].volumeInfo.description;
             googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
             anotherBreak = true;
             break;
           }
         }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
-
+          console.log("something klk 1");
+          console.log(theData.isbns[j].isbn13);
+          console.log(data.items[i].volumeInfo.industryIdentifiers[1].identifier);
+          console.log(theData.primary_isbn13);
+          console.log(data.items[i].volumeInfo.industryIdentifiers[0].identifier);
           if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+            console.log("something 1");
             googleBookDescription = data.items[i].volumeInfo.description;
             googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
             anotherBreak = true;
@@ -251,9 +263,11 @@ function findBookInfoInGoogleBooksHandler(data){
       }
 
       if(anotherBreak === true){
+        console.log("another break;");
         anotherBreak = true;
         break;
       }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
+        console.log("ha");
         googleBookDescription = data.items[i].volumeInfo.description;
         googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
         anotherBreak = true;
@@ -267,7 +281,7 @@ function findBookInfoInGoogleBooksHandler(data){
 
 
 function findBookInfoInGoogleBooks(data){
-
+  console.log(data);
   myGoogleHash[fullGoogleApiUrl] = data;
   findBookInfoInGoogleBooksHandler(myGoogleHash[fullGoogleApiUrl]);
 
@@ -277,6 +291,7 @@ function findBookInfoInGoogleBooks(data){
 function displayContent(){
 
   if(breakNotifier === false && anotherBreak === false){
+    console.log("image: "+nytImage);
     var img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
 
     $("#bookInfoPanel").find(".bookImg").empty();
@@ -311,6 +326,7 @@ function displayContent(){
       $('#reviewRow').hide();
     }
   }else if(breakNotifier === true){
+    console.log("googleBookImage1: "+googleBookImage);
     var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
 
     $("#bookInfoPanel").find(".bookImg").empty();
@@ -344,6 +360,7 @@ function displayContent(){
       $('#reviewRow').hide();
     }
   }else{
+    console.log("googleBookImage2: "+googleBookImage);
     var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
 
     $("#bookInfoPanel").find(".bookImg").empty();
