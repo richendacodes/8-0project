@@ -6,6 +6,7 @@ var nytBestSellingDict = {};
 var loadCounter;
 
 var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
+var nytReviewsApiUrl = "http://api.nytimes.com/svc/books/v3/reviews.json?"
 var fullShopApiUrl;
 var fullGoogleApiUrl;
 var nytTitle;
@@ -15,6 +16,7 @@ var nytImage;
 var nytTitleLowerCase;
 var bookTitleOnSplit;
 var bookTitle;
+var reviewUrl;
 
 var theData;
 var breakNotifier;
@@ -93,10 +95,9 @@ function getBestSellersAndFillCarousel(nytUrl){
         anchor.on("click",fillBestSellersListing);
         //console.log(data);
         img.addClass("resizeable");
+
         anchor.append(img);
-
         $('#rondellcarousel').append(anchor);
-
         if((--loadCounter) == 0){
           $('#rondellcarousel').rondell({
             preset: "carousel"
@@ -152,6 +153,7 @@ function getProductDetails(data){
   nytAuthor = theData.contributor;
   nytAmazonURL = theData.amazon_product_url;
   nytImage = theData.book_image;
+  reviewUrl = theData.book_review_link;
 
   nytTitleLowerCase = nytTitle.toLowerCase();
   bookTitleOnSplit = nytTitleLowerCase.split(' ');
@@ -291,6 +293,26 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
     $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
     $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+
+    console.log(reviewUrl.length);
+    if(reviewUrl.length !== 0){
+      var anchor = $('#reviewRow').find("a");
+
+      if(anchor !== undefined || anchor !== null){
+        $(anchor).remove();
+      }
+
+      anchor = $('<a>');
+      anchor.attr("href",reviewUrl);
+      anchor.attr("target","_blank");
+      anchor.append(reviewUrl);
+
+      $('#reviewRow').find('.col-md-12').append(anchor);
+      $('#reviewRow').show();
+    }
+    else{
+      $('#reviewRow').hide();
+    }
   }else if(breakNotifier === true){
     var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
 
@@ -305,6 +327,25 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").show().text(shopBookPrice);
     $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").show().attr("href", shopURL).attr("target", "_blank");
     $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+    console.log(reviewUrl.length);
+    if(reviewUrl.length !== 0){
+      var anchor = $('#reviewRow').find("a");
+
+      if(anchor !== undefined || anchor !== null){
+        $(anchor).remove();
+      }
+
+      anchor = $('<a>');
+      anchor.attr("href",reviewUrl);
+      anchor.attr("target","_blank");
+      anchor.append(reviewUrl);
+
+      $('#reviewRow').find('.col-md-12').append(anchor);
+      $('#reviewRow').show();
+    }
+    else{
+      $('#reviewRow').hide();
+    }
   }else{
     var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
 
@@ -319,6 +360,25 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
     $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
     $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
+    console.log(reviewUrl.length);
+    if(reviewUrl.length !== 0){
+      var anchor = $('#reviewRow').find("a");
+
+      if(anchor !== undefined || anchor !== null){
+        $(anchor).remove();
+      }
+
+      anchor = $('<a>');
+      anchor.attr("href",reviewUrl);
+      anchor.attr("target","_blank");
+      anchor.append(reviewUrl);
+
+      $('#reviewRow').find('.col-md-12').append(anchor);
+      $('#reviewRow').show();
+    }
+    else{
+      $('#reviewRow').hide();
+    }
   }
 
 }
