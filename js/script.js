@@ -36,8 +36,23 @@ function theMainFunction() {
   myFirebaseRef = new Firebase(FIREBASEURL);
   loadCounter = nytcategoryArray.length;
 
-  bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function (result) {
-    console.log("Hi " + result);
+  var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
+  var name = result.length
+
+ if (name != 0) {
+      $('#hiUser').html("Hi, " + result);
+      return;
+    } else 
+       var userAgain = bootbox.prompt("Let's try that again, please enter your name?", function(result) {
+       var name = result.length
+
+       if (name != 0) {
+            $('#hiUser').html("Hi, " + result);
+            return;
+          } else 
+            $('#hiUser').html("Hi, party pooper");
+
+      }  )    
   });
 
 
