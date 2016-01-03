@@ -4,8 +4,8 @@
 
 <ul>
   <li>Page displays a carousel showing the top book from 5 bestseller lists.</li>
-  <li>Click on a book in the carousel, and the top ten books display below.</li>
-  <li>Click on a book, and row appears with NYTimes review, Shop.com API pulls image, price, and the Google Books API will pull the books description. Users can click through to purchase book with either shop.com or amazon.com.</li>
+  <li>Click on a book in the carousel, and the bestseller books will display for that category.</li>
+  <li>Click on a book, and row appears with NYTimes review, Shop.com API pulls image, price, and with Google Books API the book description is obtained with the ISBN number. User can click through to purchase book in Amazon or if it is available in Shop.com.</li>
   <li>Click on a different book, row clears to show new information.</li>
 </ul>
 
