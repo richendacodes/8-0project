@@ -5,6 +5,7 @@ var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fi
 var nytBestSellingDict = {};
 var loadCounter;
 var isbnsCounter;
+var successfulDisplay;
 
 var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
 var fullShopApiUrl;
@@ -157,6 +158,7 @@ function getProductDetails(data){
   nytAmazonURL = theData.amazon_product_url;
   nytImage = theData.book_image;
   reviewUrl = theData.book_review_link;
+  successfulDisplay=0;
 
   nytTitleLowerCase = nytTitle.toLowerCase();
   bookTitleOnSplit = nytTitleLowerCase.split(' ');
@@ -213,18 +215,18 @@ function findProductInShopHandler(data){
       url: fullGoogleApiUrl,
       dataType: "json",
       type: "GET",
-      success: findBookInfoInGoogleBooks
+      success: findBookInfoInGoogleBooksHandler(fullGoogleApiUrl)
 
     });
   }else{
-    findBookInfoInGoogleBooksHandler(myGoogleHash[fullGoogleApiUrl]);
+    findBookInfoInGoogleBooks(myGoogleHash[fullGoogleApiUrl]);
   }
 }
 
 
-function findBookInfoInGoogleBooksHandler(data){
+function findBookInfoInGoogleBooksHandler(url){
 
-  for(var i = 0; data.items!==undefined && i < data.items.length; i++){
+  /*for(var i = 0; data.items!==undefined && i < data.items.length; i++){
 
     if(googleBookDescription !== undefined){
 
@@ -234,6 +236,7 @@ function findBookInfoInGoogleBooksHandler(data){
           continue;
         }if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
           if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
+            console.log("wHAT1");
             googleBookDescription = data.items[i].volumeInfo.description;
             googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
             anotherBreak = true;
@@ -241,7 +244,7 @@ function findBookInfoInGoogleBooksHandler(data){
           }
         }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
           if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-
+            console.log("wHAT2");
             googleBookDescription = data.items[i].volumeInfo.description;
             googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
             anotherBreak = true;
@@ -251,12 +254,6 @@ function findBookInfoInGoogleBooksHandler(data){
       }
 
       if(anotherBreak === true){
-        anotherBreak = true;
-        break;
-      }else if(nytTitleLowerCase === data.items[i].volumeInfo.title.toLowerCase()){
-        googleBookDescription = data.items[i].volumeInfo.description;
-        googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-        anotherBreak = true;
         break;
       }
     }
@@ -265,7 +262,7 @@ function findBookInfoInGoogleBooksHandler(data){
   if(anotherBreak){
     displayContent();
   }
-  else{
+  else{*/
 
     var isbns;
 
@@ -278,7 +275,7 @@ function findBookInfoInGoogleBooksHandler(data){
     isbnsCounter = isbns.length;
 
     for(var i = 0; i < isbns.length; i++){
-      fullGoogleApiUrl = "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+isbn:"+isbns[i+""].isbn13;
+      fullGoogleApiUrl = "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+isbn:"+isbns[i].isbn13+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM";
       $.ajax({
         url: fullGoogleApiUrl,
         type:"GET",
@@ -293,7 +290,8 @@ function findBookInfoInGoogleBooksHandler(data){
             return;
           }
 
-          if(dataP.items.length >= 1){
+          if(dataP.items.length >= 1 && !anotherBreak){
+
             googleBookDescription = dataP.items[0].volumeInfo.description;
             if(dataP.items[0].volumeInfo.imageLinks !== undefined){
               googleBookImage = dataP.items[0].volumeInfo.imageLinks.thumbnail;
@@ -303,7 +301,11 @@ function findBookInfoInGoogleBooksHandler(data){
             }
 
             anotherBreak = true;
-            displayContent();
+            if(++successfulDisplay != 2){
+              myGoogleHash[url] = dataP;
+              displayContent();
+            }
+
           }
           else{
             isbnsCounter--;
@@ -313,19 +315,27 @@ function findBookInfoInGoogleBooksHandler(data){
           }
 
         }
-      })
+      });
 
     }
 
-  }
+  //}
 
 
 }
 
 
 function findBookInfoInGoogleBooks(data){
-  myGoogleHash[fullGoogleApiUrl] = data;
-  findBookInfoInGoogleBooksHandler(myGoogleHash[fullGoogleApiUrl]);
+  //myGoogleHash[fullGoogleApiUrl] = data;
+  //findBookInfoInGoogleBooksHandler(myGoogleHash[fullGoogleApiUrl]);
+  googleBookDescription = data.items[0].volumeInfo.description;
+  if(data.items[0].volumeInfo.imageLinks !== undefined){
+    googleBookImage = data.items[0].volumeInfo.imageLinks.thumbnail;
+  }
+  else{
+    googleBookImage = nytImage;
+  }
+  anotherBreak = true;
 
 }
 
@@ -365,9 +375,15 @@ function displayContent(){
     else{
       $('#reviewRow').hide();
     }
-  }else if(breakNotifier === true && anotherBreak === false){
+  }else if(breakNotifier === true){
+    var img;
+    if(anotherBreak){
+      img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
+    }
+    else{
+      img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
+    }
 
-    var img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
 
     $("#bookInfoPanel").find(".bookImg").empty();
     $("#bookInfoPanel").find(".bookImg").append(img);
@@ -375,7 +391,20 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".col-md-6").children().empty();
     $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
     $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
-    $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(theData.description);
+
+    if(anotherBreak){
+      if(googleBookDescription !== undefined){
+        $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
+      }
+      else{
+       //should put nyt description.
+      }
+
+    }
+    else{
+      $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(theData.description);
+    }
+
 
     $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").show().text(shopBookPrice);
     $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").show().attr("href", shopURL).attr("target", "_blank");
@@ -401,7 +430,7 @@ function displayContent(){
     }
   }else{
 
-    var img = $('<img>').attr("src", googleBookImage).addClass("resize").addClass("centerimage");
+    var img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
 
     $("#bookInfoPanel").find(".bookImg").empty();
     $("#bookInfoPanel").find(".bookImg").append(img);
