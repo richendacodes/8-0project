@@ -4,5 +4,18 @@
   "e-book-fiction":"https://api.nytimes.com/svc/books/v3/lists/e-book-fiction.json",
   "mass-market-paperback":"https://api.nytimes.com/svc/books/v3/lists/mass-market-paperback.json",
   "hardcover-nonfiction":"https://api.nytimes.com/svc/books/v3/lists/hardcover-nonfiction.json",
-  "e-book-nonfiction":"https://api.nytimes.com/svc/books/v3/lists/e-book-nonfiction.json"
+  "e-book-nonfiction":"https://api.nytimes.com/svc/books/v3/lists/e-book-nonfiction.json",
+  "paperback-nonfiction":"https://api.nytimes.com/svc/books/v3/lists/paperback-nonfiction.json",
+  "advice-how-to-and-miscellaneous":"https://api.nytimes.com/svc/books/v3/lists/advice-how-to-and-miscellaneous.json",
+  "picture-books":"https://api.nytimes.com/svc/books/v3/lists/picture-books.json",
+  "childrens-middle-grade-hardcover":"https://api.nytimes.com/svc/books/v3/lists/childrens-middle-grade-hardcover.json",
+  "childrens-middle-grade-paperback":"https://api.nytimes.com/svc/books/v3/lists/childrens-middle-grade-paperback.json",
+  "childrens-middle-grade-e-book":"https://api.nytimes.com/svc/books/v3/lists/childrens-middle-grade-e-book.json",
+  "young-adult-hardcover":"https://api.nytimes.com/svc/books/v3/lists/young-adult-hardcover.json",
+  "young-adult-paperback":"https://api.nytimes.com/svc/books/v3/lists/young-adult-paperback.json",
+  "young-adult-e-book":"https://api.nytimes.com/svc/books/v3/lists/young-adult-e-book.json",
+  "series-books":"https://api.nytimes.com/svc/books/v3/lists/series-books.json",
+  "hardcover-graphic-books":"https://api.nytimes.com/svc/books/v3/lists/hardcover-graphic-books.json",
+  "paperback-graphic-books":"https://api.nytimes.com/svc/books/v3/lists/paperback-graphic-books.json",
+  "manga":"https://api.nytimes.com/svc/books/v3/lists/manga.json"
 }
