@@ -19,12 +19,14 @@ var bookTitleOnSplit;
 var bookTitle;
 var reviewUrl;
 
-var theData;
+var theProductData;
+var theGoogleData;
 var breakNotifier;
 var anotherBreak;
 var bookSearchItem;
 var shopBookPrice;
 var shopURL;
+var author;
 
 var googleBookDescription;
 var googleBookImage;
@@ -150,14 +152,16 @@ function fillBestSellersListing(){
 
 function getProductDetails(data){
 
-  theData = data;
+  theProductData = data;
   breakNotifier = false;
   anotherBreak = false;
-  nytTitle = theData.title;
-  nytAuthor = theData.contributor;
-  nytAmazonURL = theData.amazon_product_url;
-  nytImage = theData.book_image;
-  reviewUrl = theData.book_review_link;
+  nytTitle = theProductData.title;
+  nytAuthor = theProductData.contributor;
+  author = theProductData.author;
+
+  nytAmazonURL = theProductData.amazon_product_url;
+  nytImage = theProductData.book_image;
+  reviewUrl = theProductData.book_review_link;
   successfulDisplay=0;
 
   nytTitleLowerCase = nytTitle.toLowerCase();
@@ -190,12 +194,12 @@ function findProductInShop(data){
 
 
 function findProductInShopHandler(data){
-  fullGoogleApiUrl = "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+isbn:"+theData.primary_isbn13+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM";
+  fullGoogleApiUrl = "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+intitle:"+nytTitle+"+inauthor:"+author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM";
 
-  for(var i = 0; i < theData.isbns.length; i++) {
+  for(var i = 0; i < theProductData.isbns.length; i++) {
     for(var j = 0; j < data.searchItems.length; j++){
 
-      if((theData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
+      if((theProductData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theProductData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
         breakNotifier = true;
         bookSearchItem = data.searchItems[j];
         shopBookPrice = data.searchItems[j].priceInfo.price;
@@ -211,6 +215,7 @@ function findProductInShopHandler(data){
 
   if(myGoogleHash[fullGoogleApiUrl] === undefined) {
     fullGoogleApiUrl = fullGoogleApiUrl.replace(/ /g,"%20");
+
     $.ajax({
       url: fullGoogleApiUrl,
       dataType: "json",
@@ -226,54 +231,18 @@ function findProductInShopHandler(data){
 
 function findBookInfoInGoogleBooksHandler(data){
 
-  /*for(var i = 0; data.items!==undefined && i < data.items.length; i++){
+  theGoogleData = data;
 
-    if(googleBookDescription !== undefined){
-
-      for(var j = 0; j < theData.isbns.length; j++){
-
-        if(data.items[i].volumeInfo.industryIdentifiers === undefined){
-          continue;
-        }if(data.items[i].volumeInfo.industryIdentifiers[0].type === "ISBN_13"){
-          if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-            console.log("wHAT1");
-            googleBookDescription = data.items[i].volumeInfo.description;
-            googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-            anotherBreak = true;
-            break;
-          }
-        }else if(data.items[i].volumeInfo.industryIdentifiers[1].type === "ISBN_13"){
-          if(theData.isbns[j].isbn13 === data.items[i].volumeInfo.industryIdentifiers[1].identifier || theData.primary_isbn13 === data.items[i].volumeInfo.industryIdentifiers[0].identifier){
-            console.log("wHAT2");
-            googleBookDescription = data.items[i].volumeInfo.description;
-            googleBookImage = data.items[i].volumeInfo.imageLinks.thumbnail;
-            anotherBreak = true;
-            break;
-          }
-        }
-      }
-
-      if(anotherBreak === true){
-        break;
-      }
-    }
-  }
-
-  if(anotherBreak){
-    displayContent();
-  }
-  else{*/
-  console.log(data);
-  if(data.items === undefined){
+  if(theGoogleData.items === undefined){
     displayContent();
     return;
   }
 
-  if(data.items.length > 0){
+  if(theGoogleData.items.length > 0){
 
-    googleBookDescription = data.items[0].volumeInfo.description;
-    if(data.items[0].volumeInfo.imageLinks !== undefined){
-      googleBookImage = dataP.items[0].volumeInfo.imageLinks.thumbnail;
+    googleBookDescription = theGoogleData.items[0].volumeInfo.description;
+    if(theGoogleData.items[0].volumeInfo.imageLinks !== undefined){
+      googleBookImage = theGoogleData.items[0].volumeInfo.imageLinks.thumbnail;
     }
     else{
       googleBookImage = nytImage;
@@ -283,17 +252,9 @@ function findBookInfoInGoogleBooksHandler(data){
 
     displayContent();
 
-
-  }
-  else{
+  }else{
     displayContent();
   }
-
-
-
-  //}
-
-
 }
 
 
@@ -307,6 +268,7 @@ function findBookInfoInGoogleBooks(data){
 function displayContent(){
 
   if(breakNotifier === false && anotherBreak === false){
+
     var img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
 
     $("#bookInfoPanel").find(".bookImg").empty();
@@ -335,16 +297,24 @@ function displayContent(){
 
       $('#reviewRow').find('.col-md-12').append(anchor);
       $('#reviewRow').show();
-    }
-    else{
+
+    }else{
       $('#reviewRow').hide();
     }
+
   }else if(breakNotifier === true){
+
     var img;
+
     if(anotherBreak){
-      img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
-    }
-    else{
+
+      if(nytImage === googleBookImage){
+        img = $('<img>').attr("src", googleBookImage).addClass("resize").addClass("centerimage");
+      }else{
+        img = $('<img>').attr("src", googleBookImage).addClass("centerimage");
+      }
+    }else{
+
       img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
     }
 
@@ -366,7 +336,7 @@ function displayContent(){
 
     }
     else{
-      $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(theData.description);
+      $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(theProductData.description);
     }
 
 
