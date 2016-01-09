@@ -35,3 +35,6 @@ NY Times Bestseller API <a href="http://developer.nytimes.com/docs/read/best_sel
 <h4>Trello Link</h4>
 
 <a href="https://trello.com/b/SRhmJ7w6/rcb-catalog-project" target="_blank">https://trello.com/b/SRhmJ7w6/rcb-catalog-project</a>
+
+<h4>Presentation</h4>
+<a href="https://docs.google.com/presentation/d/1f0GZ923knDGsQakqxZZs-6qmS7Kc9eQe1Nw8Yd0neWg/edit?usp=sharing">https://docs.google.com/presentation/d/1f0GZ923knDGsQakqxZZs-6qmS7Kc9eQe1Nw8Yd0neWg/edit?usp=sharing</a>
