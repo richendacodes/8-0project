@@ -4,83 +4,75 @@ var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fi
   'hardcover-nonfiction','e-book-nonfiction','paperback-nonfiction','advice-how-to-and-miscellaneous'];
 var nytBestSellingDict = {};
 var loadCounter;
-var isbnsCounter;
-var successfulDisplay;
 
-var shopApiUrl = "https://api.shop.com/sites/v1/search/term/Books/";
-var fullShopApiUrl;
+var ebayFindItemApiUrl = "http://svcs.ebay.com/services/search/FindingService/v1?OPERATION-NAME=findItemsByProduct&SERVICE-VERSION=1.0.0&SECURITY-APPNAME="
+var ebayFindProductApiUrl = "http://open.api.ebay.com/shopping?callname=FindProducts&appid=";
+var ebayShopLink;
+var ebayPrice;
+var ebayInfoExist;
+var snapShot;
+
 var fullGoogleApiUrl;
 var nytTitle;
 var nytAuthor;
 var nytAmazonURL;
 var nytImage;
-var nytTitleLowerCase;
-var bookTitleOnSplit;
-var bookTitle;
 var reviewUrl;
 
 var theProductData;
 var theGoogleData;
-var breakNotifier;
-var anotherBreak;
-var bookSearchItem;
-var shopBookPrice;
-var shopURL;
+var googleInfoExist;
 var author;
 
 var googleBookDescription;
 var googleBookImage;
-
-var myProductHash = {};
 var myGoogleHash = {};
 
 $( document ).ready(theMainFunction);
-
 
 function theMainFunction() {
   myFirebaseRef = new Firebase(FIREBASEURL);
   loadCounter = nytcategoryArray.length;
 
-  var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
-  var name = result.length;
+  //var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
+  //var name = result.length;
 
- if (name != 0) {
-      $('#hiUser').html("Hi, " + result);
-      return;
-    } else 
-       var userAgain = bootbox.prompt("Let's try that again, please enter your name?", function(result) {
-       var name = result.length;
+ //if (name != 0) {
+ //  $('#hiUser').html("Hi, " + result);
+ //  return;
+ //} else
+ //    var userAgain = bootbox.prompt("Let's try that again, please enter your name?", function(result) {
+ //    var name = result.length;
+ //
+ //    if (name != 0) {
+ //      $('#hiUser').html("Hi, " + result);
+ //      return;
+ //    } else
+ //      $('#hiUser').html("Hi, party pooper");
+ //   })
+ // });
 
-       if (name != 0) {
-            $('#hiUser').html("Hi, " + result);
-            return;
-          } else 
-            $('#hiUser').html("Hi, party pooper");
+  var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
 
-      }  )    
-  });
+    $.ajax({
+      url:"js/categorybooklist.json",
+      dataType:"json",
+      type:"GET",
+      success: function(data){
+        for(var i = 0; i < nytcategoryArray.length; i++){
+          getBestSellersAndFillCarousel(data[nytcategoryArray[i]],snapshot.val());
 
-
-  $.ajax({
-    url:"js/categorybooklist.json",
-    dataType:"json",
-    type:"GET",
-    success: function(data){
-      for(var i = 0; i < nytcategoryArray.length; i++){
-        getBestSellersAndFillCarousel(data[nytcategoryArray[i]]);
-
+        }
       }
-    }
+    });
 
   });
 
 }
 
 
-function getBestSellersAndFillCarousel(nytUrl){
+function getBestSellersAndFillCarousel(nytUrl,key){
 
-  var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
-    var key = snapshot.val();
     key = key.replace(/:/g,"%3A");
     nytUrl+="?"+"api-key="+key;
 
@@ -112,7 +104,6 @@ function getBestSellersAndFillCarousel(nytUrl){
         }
       }
     });
-  });
 }
 
 
@@ -127,6 +118,7 @@ function callGetProductDetails(anchor,isMany){
 function fillBestSellersListing(){
   var books = $(this).val()["books"];
   var listing = $(this).val()["listing"];
+
   $('#bestsellerList').find('.panel-heading').find('h4').html(listing);
   $('#bestsellerList').find('.panel-body').empty();
 
@@ -143,18 +135,21 @@ function fillBestSellersListing(){
     span.append(books[""+i]["author"]);
     div.append(span);
     div.val(books[""+i]);
-    div.on("click",function(){callGetProductDetails(this,false)});
-    $('#bestsellerList').find('.panel-body').append(div);
+    div.on("click",function(){
+      callGetProductDetails(this,false)
+    });
 
+    $('#bestsellerList').find('.panel-body').append(div);
   }
 }
+
 
 
 function getProductDetails(data){
 
   theProductData = data;
-  breakNotifier = false;
-  anotherBreak = false;
+  ebayInfoExist = false;
+  googleInfoExist = false;
   nytTitle = theProductData.title;
   nytAuthor = theProductData.contributor;
   author = theProductData.author;
@@ -162,56 +157,77 @@ function getProductDetails(data){
   nytAmazonURL = theProductData.amazon_product_url;
   nytImage = theProductData.book_image;
   reviewUrl = theProductData.book_review_link;
-  successfulDisplay=0;
-
-  nytTitleLowerCase = nytTitle.toLowerCase();
-  bookTitleOnSplit = nytTitleLowerCase.split(' ');
-  bookTitle = bookTitleOnSplit.join("+");
-
-  fullShopApiUrl = shopApiUrl+bookTitle;
 
 
-  if(myProductHash[fullShopApiUrl] === undefined){
-    $.ajax({
-      url: fullShopApiUrl,
-      dataType: "json",
+  var ebayRef = myFirebaseRef.child("APIKEYS/ebay").on("value", function(snapshot) {
+    snapShot = snapshot.val();
+
+    $.ajax
+    ({
       type: "GET",
-      success: findProductInShop
+      url: ebayFindProductApiUrl + snapShot + '&version=517&siteid=0',
+      dataType: "jsonp",
+      jsonp: "callbackname",
+      crossDomain : true,
+      data: {
+        'QueryKeywords' : nytTitle + " Book " + author,
+        'MaxEntries' : '3',
+        'responseencoding': 'JSON'
+      },
+      success: ebayProductIdRetrieval,
+      error: function (data) {
+        console.log(arguments);
+      }
+    });
 
+  });
+}
+
+
+
+function ebayProductIdRetrieval(result){
+
+  if(result.Ack === "Success") {
+    var productId = result.Product[0].ProductID[0].Value;
+
+    $.ajax({
+      type: "GET",
+      url: ebayFindItemApiUrl + snapShot + '&RESPONSE-DATA-FORMAT=JSON&paginationInput.entriesPerPage=2&productId.@type=ReferenceID&productId=' + productId,
+      dataType: "jsonp",
+      crossDomain: true,
+      success: ebayInfoRetrieval,
+      error: function (data) {
+        console.log(arguments);
+      }
     });
   }else{
-    findProductInShopHandler(myProductHash[fullShopApiUrl]);
+    console.log("Error");
+    findProductInGoogleHandler(result);
+  }
+}
+
+
+
+function ebayInfoRetrieval(result){
+
+
+  if(result.findItemsByProductResponse[0].searchResult[0].item !== undefined){
+    ebayShopLink = result.findItemsByProductResponse[0].itemSearchURL[0];
+    ebayPrice = result.findItemsByProductResponse[0].searchResult[0].item[0].sellingStatus[0].currentPrice[0].__value__;
+    ebayInfoExist = true;
+
+    findProductInGoogleHandler(result);
+  }else{
+    console.log("No Ebay Info Available");
+    findProductInGoogleHandler(result);
   }
 
 }
 
 
-function findProductInShop(data){
 
-  myProductHash[fullShopApiUrl] = data;
-  findProductInShopHandler(myProductHash[fullShopApiUrl]);
-}
-
-
-function findProductInShopHandler(data){
+function findProductInGoogleHandler(data){
   fullGoogleApiUrl = "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+intitle:"+nytTitle+"+inauthor:"+author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM";
-
-  for(var i = 0; i < theProductData.isbns.length; i++) {
-    for(var j = 0; j < data.searchItems.length; j++){
-
-      if((theProductData.isbns[i].isbn13 === data.searchItems[j].prods_CatalogSKU) || (theProductData.isbns[i].isbn13 === data.searchItems[j].manufacturerPartNumber)){
-        breakNotifier = true;
-        bookSearchItem = data.searchItems[j];
-        shopBookPrice = data.searchItems[j].priceInfo.price;
-        shopURL = data.searchItems[j].modelQuickViewDetails.linkUrl;
-        break;
-      }
-    }
-
-    if(breakNotifier == true){
-      break;
-    }
-  }
 
   if(myGoogleHash[fullGoogleApiUrl] === undefined) {
     fullGoogleApiUrl = fullGoogleApiUrl.replace(/ /g,"%20");
@@ -229,6 +245,7 @@ function findProductInShopHandler(data){
 }
 
 
+
 function findBookInfoInGoogleBooksHandler(data){
 
   theGoogleData = data;
@@ -241,21 +258,21 @@ function findBookInfoInGoogleBooksHandler(data){
   if(theGoogleData.items.length > 0){
 
     googleBookDescription = theGoogleData.items[0].volumeInfo.description;
+
     if(theGoogleData.items[0].volumeInfo.imageLinks !== undefined){
       googleBookImage = theGoogleData.items[0].volumeInfo.imageLinks.thumbnail;
-    }
-    else{
+    } else{
       googleBookImage = nytImage;
     }
 
-    anotherBreak = true;
-
+    googleInfoExist = true;
     displayContent();
-
   }else{
+
     displayContent();
   }
 }
+
 
 
 function findBookInfoInGoogleBooks(data){
@@ -265,9 +282,10 @@ function findBookInfoInGoogleBooks(data){
 }
 
 
+
 function displayContent(){
 
-  if(breakNotifier === false && anotherBreak === false){
+  if(ebayInfoExist === false && googleInfoExist === false){
 
     var img = $('<img>').attr("src", nytImage).addClass("resize").addClass("centerimage");
 
@@ -280,7 +298,7 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text("No description available at this time...");
 
     $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
-    $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
+    $("#bookInfoPanel").find(".row").find(".bookEbayLink").children("a").hide();
     $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
 
     if(reviewUrl.length !== 0){
@@ -302,11 +320,11 @@ function displayContent(){
       $('#reviewRow').hide();
     }
 
-  }else if(breakNotifier === true){
+  }else if(ebayInfoExist === true){
 
     var img;
 
-    if(anotherBreak){
+    if(googleInfoExist){
 
       if(nytImage === googleBookImage){
         img = $('<img>').attr("src", googleBookImage).addClass("resize").addClass("centerimage");
@@ -326,7 +344,7 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".col-md-6").children("h4").text(nytTitle);
     $("#bookInfoPanel").find(".row").find(".col-md-6").children("#author").text(nytAuthor);
 
-    if(anotherBreak){
+    if(googleInfoExist){
       if(googleBookDescription !== undefined){
         $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
       }
@@ -340,8 +358,8 @@ function displayContent(){
     }
 
 
-    $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").show().text(shopBookPrice);
-    $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").show().attr("href", shopURL).attr("target", "_blank");
+    $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").show().text("Price: $" + (parseFloat(ebayPrice)).toFixed(2));
+    $("#bookInfoPanel").find(".row").find(".bookEbayLink").children("a").show().attr("href", ebayShopLink).attr("target", "_blank");
     $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
 
     if(reviewUrl.length !== 0){
@@ -375,7 +393,7 @@ function displayContent(){
     $("#bookInfoPanel").find(".row").find(".col-md-6").children("#description").text(googleBookDescription);
 
     $("#bookInfoPanel").find(".row").find(".bookPrice").children("H5").hide();
-    $("#bookInfoPanel").find(".row").find(".bookShopLink").children("a").hide();
+    $("#bookInfoPanel").find(".row").find(".bookEbayLink").children("a").hide();
     $("#bookInfoPanel").find(".row").find(".bookAmazonLink").children("a").attr("href", nytAmazonURL).attr("target", "_blank");
 
     if(reviewUrl.length !== 0){
@@ -398,6 +416,6 @@ function displayContent(){
     }
   }
 
-  breakNotifier = false;
-  anotherBreak = false;
+  ebayInfoExist = false;
+  googleInfoExist = false;
 }
