@@ -5,8 +5,8 @@ var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fi
 var nytBestSellingDict = {};
 var loadCounter;
 
-var ebayFindItemApiUrl = "https://svcs.ebay.com/services/search/FindingService/v1?OPERATION-NAME=findItemsByProduct&SERVICE-VERSION=1.0.0&SECURITY-APPNAME="
-var ebayFindProductApiUrl = "https://open.api.ebay.com/shopping?callname=FindProducts&appid=";
+var ebayFindItemApiUrl = "http://svcs.ebay.com/services/search/FindingService/v1?OPERATION-NAME=findItemsByProduct&SERVICE-VERSION=1.0.0&SECURITY-APPNAME="
+var ebayFindProductApiUrl = "http://open.api.ebay.com/shopping?callname=FindProducts&appid=";
 var ebayShopLink;
 var ebayPrice;
 var ebayInfoExist;
