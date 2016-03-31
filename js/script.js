@@ -51,9 +51,10 @@ function theMainFunction() {
     }
   });
 
-
+  //Gets NYT api key from firebase
   var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
 
+    // Makes an Api call to our local json file to get a list of categories
     $.ajax({
       url:"js/categorybooklist.json",
       dataType:"json",
@@ -71,6 +72,7 @@ function theMainFunction() {
 }
 
 
+//After the Api call to the New York Times API, fill the coverflow with the top book of each category
 function getBestSellersAndFillCarousel(nytUrl,key){
 
   key = key.replace(/:/g,"%3A");
@@ -82,6 +84,7 @@ function getBestSellersAndFillCarousel(nytUrl,key){
     type: "GET",
     success: function (data) {
 
+      //Fills CoverFlow
       var list = $('<li>');
       var img = $('<img>');
       var anchor = $('<a>');
@@ -116,7 +119,7 @@ function callGetProductDetails(anchor,isMany){
     getProductDetails($(anchor).val());
 }
 
-
+//Fills the BestSellerList predefined in the html file
 function fillBestSellersListing(){
   var books = $(this).val()["books"];
   var listing = $(this).val()["listing"];
@@ -161,9 +164,12 @@ function getProductDetails(data){
   reviewUrl = theProductData.book_review_link;
 
 
+  // Gets Ebay API key from firebase
   var ebayRef = myFirebaseRef.child("APIKEYS/ebay").on("value", function(snapshot) {
     snapShot = snapshot.val();
 
+
+    //Make an API call to find a product according to book title, and author
     $.ajax
     ({
       type: "GET",
@@ -186,7 +192,7 @@ function getProductDetails(data){
 }
 
 
-
+// When product was found then make another ebay api call to get the products url and price
 function ebayProductIdRetrieval(result){
 
   if(result.Ack === "Success") {
@@ -209,7 +215,7 @@ function ebayProductIdRetrieval(result){
 }
 
 
-
+// Sets EBAY info from the returned values of ebay api call
 function ebayInfoRetrieval(result){
 
 
@@ -227,7 +233,7 @@ function ebayInfoRetrieval(result){
 }
 
 
-
+// Makes an API call to GoogleBooks Api in order to get books description
 function findProductInGoogleHandler(data){
   fullGoogleApiUrl = "https://www.googleapis.com/books/v1/volumes?q="+nytTitle+"+intitle:"+nytTitle+"+inauthor:"+author+"&key=AIzaSyBs2Kqqt1HgWffErU0e9XIQhj-CjYEswGM";
 
@@ -247,7 +253,7 @@ function findProductInGoogleHandler(data){
 }
 
 
-
+// From GoogleBooksApi result, set values to variables
 function findBookInfoInGoogleBooksHandler(data){
 
   theGoogleData = data;
@@ -284,7 +290,7 @@ function findBookInfoInGoogleBooks(data){
 }
 
 
-
+//Displays result to html file depending what information about the book is available
 function displayContent(){
 
   if(ebayInfoExist === false && googleInfoExist === false){
