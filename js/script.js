@@ -34,23 +34,24 @@ function theMainFunction() {
   myFirebaseRef = new Firebase(FIREBASEURL);
   loadCounter = nytcategoryArray.length;
 
-  //var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result) {
-  //var name = result.length;
+  var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result){
+    var name = result.length;
+    if (name != 0) {
+      $('#hiUser').html("Hi, " + result);
+      return;
+    }else {
+      var userAgain = bootbox.prompt("Let's try that again, please enter your name?", function (result) {
+        var name = result.length;
 
- //if (name != 0) {
- //  $('#hiUser').html("Hi, " + result);
- //  return;
- //} else
- //    var userAgain = bootbox.prompt("Let's try that again, please enter your name?", function(result) {
- //    var name = result.length;
- //
- //    if (name != 0) {
- //      $('#hiUser').html("Hi, " + result);
- //      return;
- //    } else
- //      $('#hiUser').html("Hi, party pooper");
- //   })
- // });
+        if (name != 0) {
+          $('#hiUser').html("Hi, " + result);
+          return;
+        } else
+          $('#hiUser').html("Hi, party pooper");
+      })
+    }
+  });
+
 
   var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
 
@@ -73,41 +74,43 @@ function theMainFunction() {
 
 function getBestSellersAndFillCarousel(nytUrl,key){
 
-    key = key.replace(/:/g,"%3A");
-    nytUrl+="?"+"api-key="+key;
+  key = key.replace(/:/g,"%3A");
+  nytUrl+="?"+"api-key="+key;
 
-    $.ajax({
-      url: nytUrl,
-      dataType: "json",
-      type: "GET",
-      success: function (data) {
+  $.ajax({
+    url: nytUrl,
+    dataType: "json",
+    type: "GET",
+    success: function (data) {
 
-        var anchor = $('<a>');
-        anchor.attr("rel","rondell");
-        anchor.attr("href","#");
-        var img = $('<img>');
-        img.attr("src",data["results"]["books"]["0"]["book_image"]);
-        anchor.val({"books":data["results"]["books"],
-                    "listing":data["results"]["list_name"]});
-        anchor.on("click",function(){callGetProductDetails(this,true)});
-        anchor.on("click",fillBestSellersListing);
+      var list = $('<li>');
+      var img = $('<img>');
+      var anchor = $('<a>');
+      anchor.attr("rel","rondell");
+      anchor.attr("href","#");
+      img.attr("src",data["results"]["books"]["0"]["book_image"]);
+      img.addClass("resizeFlip");
+      anchor.val({"books":data["results"]["books"], "listing":data["results"]["list_name"]});
+      anchor.on("click",function(){callGetProductDetails(this,true)});
+      anchor.on("click",fillBestSellersListing);
 
-        img.addClass("resizeable");
+      $('#theflip').append(list.append(anchor.append(img)));
 
-        anchor.append(img);
-        $('#rondellcarousel').append(anchor);
-        if((--loadCounter) == 0){
-          $('#rondellcarousel').rondell({
-            preset: "carousel"
-          },function(){},function(){$('#rondellcarousel').find('.rondell-item-focused').trigger("click")});
+      if((--loadCounter) == 0) {
+        $('.my-flipster').flipster({
+          start: 'center',
+          scrollwheel: false
+        });
 
-        }
+        $('#theflip').find('.flipster__item--current').find('a').trigger("click");
       }
-    });
+    }
+  });
 }
 
 
 function callGetProductDetails(anchor,isMany){
+
   if(isMany)
     getProductDetails($(anchor).val()["books"]["0"]);
   else
