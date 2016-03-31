@@ -1,6 +1,6 @@
 var FIREBASEURL = "https://livecatalog.firebaseio.com/";
 var myFirebaseRef;
-var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','e-book-fiction','mass-market-paperback',
+var nytcategoryArray = ['hardcover-fiction','trade-fiction-paperback','young-adult-hardcover','mass-market-paperback',
   'hardcover-nonfiction','e-book-nonfiction','paperback-nonfiction','advice-how-to-and-miscellaneous'];
 var nytBestSellingDict = {};
 var loadCounter;
@@ -46,8 +46,7 @@ function theMainFunction() {
         if (name != 0) {
           $('#hiUser').html("Hi, " + result);
           return;
-        } else
-          $('#hiUser').html("Hi, party pooper");
+        }
       })
     }
   });

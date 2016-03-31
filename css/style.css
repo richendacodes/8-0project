@@ -9,10 +9,13 @@
 .bestsellerTitle {
   font-size: 16px;
   font-weight: bold;
+  font-family: 'Alegreya Sans', sans-serif;
+  font-style: italic;
 }
 
 .bestsellerAuthor {
-  font-style: italic;
+  /*font-style: italic;*/
+  font-family: 'Lato', sans-serif;
 }
 
 .centerimage{
@@ -29,4 +32,40 @@
 .resizeFlip {
   width: auto;
   height: 400px;
+}
+
+.navbar-brand{
+  font-family: 'Oswald', sans-serif;
+}
+
+#thedevelopers{
+  font-family: 'Oswald', sans-serif;
+}
+
+#hiUser{
+  font-size: 20px;
+  font-family: 'Oswald', sans-serif;
+}
+
+.panel-heading h4 {
+  font-size: 20px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: bold;
+}
+
+#bookTitle {
+  font-size: 25px;
+  font-weight: bold;
+  font-family: 'Oswald', sans-serif;
+}
+
+#author {
+  font-size: 15px;
+  font-family: 'Oswald', sans-serif;
+}
+
+#description {
+  font-style: italic;
+  font-size: 15px;
+  font-family: 'Lato', sans-serif;
 }

@@ -4,7 +4,7 @@
 
 <ul>
   <li>Page displays a carousel showing the top book from 5 bestseller lists.</li>
-  <li>Click on a book in the carousel, and the bestseller books will display for that category.</li>
+  <li>Click on a book in the coverflow, and the bestseller books will display for that category.</li>
   <li>Click on a book, and row appears with NYTimes review, Ebay.com API pulls link, price, and with Google Books API the book description is obtained with the ISBN number. User can click through to purchase book in Amazon or if it is available in Shop.com.</li>
   <li>Click on a different book, row clears to show new information.</li>
 </ul>
@@ -21,10 +21,6 @@
   <li>JSON</li>
   <li>Bootstrap</li>
 </ul>
-
-<h4>Deployed Link</h4>
-
-<a href="http://enigmatic-reef-5753.herokuapp.com/">http://enigmatic-reef-5753.herokuapp.com/</a>
 
 <h4>API's Used</h4>
 
