@@ -34,22 +34,6 @@ function theMainFunction() {
   myFirebaseRef = new Firebase(FIREBASEURL);
   loadCounter = nytcategoryArray.length;
 
-  var userName = bootbox.prompt("Welcome to LiveCatalog, please enter your name?", function(result){
-    var name = result.length;
-    if (name != 0) {
-      $('#hiUser').html("Hi, " + result);
-      return;
-    }else {
-      var userAgain = bootbox.prompt("Let's try that again, please enter your name?", function (result) {
-        var name = result.length;
-
-        if (name != 0) {
-          $('#hiUser').html("Hi, " + result);
-          return;
-        }
-      })
-    }
-  });
 
   //Gets NYT api key from firebase
   var nyTimesRef = myFirebaseRef.child("APIKEYS/nytimes").on("value", function(snapshot) {
