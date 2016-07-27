@@ -68,6 +68,14 @@
   font-family: 'Lato', sans-serif;
 }
 
-footer {
+.footer {
+  background-color: #2C3E50;
   font-family: 'Oswald', sans-serif;
+}
+
+.text-muted {
+  color: #FFFFFF;
+  text-align: center;
+  padding-top: 1%;
+  padding-bottom: 1%;
 }
